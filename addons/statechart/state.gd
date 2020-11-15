@@ -37,8 +37,6 @@ func init_states(root_state, first_branch):
 			c.active = false
 			if c.fsm_owner != null:
 				c.target = c.get_node(c.fsm_owner)
-				print(c.fsm_owner, " ", c.target)
-
 			else: c.target = root_state.target
 			c.fallback = root_state
 			if first_branch && (has_regions || c == get_child(0)):
@@ -104,7 +102,7 @@ func change_state(new_state):
 	common_root.reset_done_this_frame(true)
 	# signal the change
 	emit_signal("state_changed", self)
-#	print("'%s' -> '%s'" % [get_name(), new_state])
+	print("'%s' -> '%s'" % [get_name(), new_state])
 
 
 func find_state_node(new_state, just_done):

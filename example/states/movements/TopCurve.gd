@@ -4,7 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func on_enter():
-	pass
+	play("TopCurve")
 
 
 func after_enter():
@@ -29,3 +29,8 @@ func on_exit():
 
 func on_timeout(_name):
 	pass
+
+
+# This method is called by my AnimationPlayer, at the end of the "TopCurve" Animation
+func on_finished_animation():
+		change_state("Fall")

@@ -4,7 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func on_enter():
-	pass
+	play("FlyUp")
 
 
 func after_enter():
@@ -12,7 +12,8 @@ func after_enter():
 
 
 func on_update(_delta):
-	pass
+	if target.velocity.y > -250:
+		change_state("TopCurve")
 
 
 func after_update(_delta):

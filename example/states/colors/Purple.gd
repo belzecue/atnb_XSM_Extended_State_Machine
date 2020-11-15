@@ -4,7 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func on_enter():
-	pass
+	target.modulate = Color("8414d9")
 
 
 func after_enter():
@@ -12,7 +12,10 @@ func after_enter():
 
 
 func on_update(_delta):
-	pass
+	if Input.is_action_just_pressed("prev_color"):
+		change_state("Orange")
+	elif Input.is_action_just_pressed("next_color"):
+		change_state("Green")
 
 
 func after_update(_delta):

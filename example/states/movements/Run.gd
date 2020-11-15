@@ -4,7 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func on_enter():
-	pass
+	play("Run")
 
 
 func after_enter():
@@ -12,7 +12,10 @@ func after_enter():
 
 
 func on_update(_delta):
-	pass
+	if target.dir == 0:
+		change_state("Walk")
+	elif abs(target.velocity.x) > target.run_margin:
+		change_state("Walk")
 
 
 func after_update(_delta):

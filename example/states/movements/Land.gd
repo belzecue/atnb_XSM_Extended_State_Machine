@@ -4,7 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func on_enter():
-	pass
+	play("Land")
 
 
 func after_enter():
@@ -29,3 +29,7 @@ func on_exit():
 
 func on_timeout(_name):
 	pass
+
+
+func on_landed():
+	change_state("Idle")
