@@ -8,15 +8,34 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "",
+"class": "GitAPI",
+"language": "NativeScript",
+"path": "res://git_api.gdns"
+}, {
+"base": "Node",
+"class": "State",
+"language": "GDScript",
+"path": "res://addons/statechart/state.gd"
+} ]
 _global_script_class_icons={
-
+"GitAPI": "",
+"State": ""
 }
 
 [application]
 
 config/name="XSM Extended State Machine"
 config/icon="res://icon.png"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "statechart" )
+
+[gdnative]
+
+singletons=[ "res://git_api.gdnlib" ]
 
 [rendering]
 
