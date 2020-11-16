@@ -3,6 +3,10 @@
 export.cfg
 export_presets.cfg
 
+# Git Plugin
+bin/
+git*
+
 # Imported translations (automatically generated from CSV files)
 *.translation
 
