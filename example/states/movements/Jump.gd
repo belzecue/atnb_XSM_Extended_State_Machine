@@ -12,10 +12,6 @@ func on_enter():
 	jumping = true
 
 
-func after_enter():
-	pass
-
-
 func on_update(_delta):
 	if Input.is_action_just_released("jump"):
 		jumping = false
@@ -24,14 +20,6 @@ func on_update(_delta):
 		target.velocity.y = -target.jump_speed
 		if last_state.get_name() == "Fall":
 			jumping = false
-
-
-func after_update(_delta):
-	pass
-
-
-func before_exit():
-	pass
 
 
 func on_exit():
@@ -44,4 +32,4 @@ func on_jump_finished():
 
 func on_timeout(_name):
 	jumping = false
-	change_state("FlyUp")
+	change_state("Fall")

@@ -7,28 +7,12 @@ func on_enter():
 	play("Walk")
 
 
-func after_enter():
-	pass
-
-
 func on_update(_delta):
-	if abs(target.velocity.x) > target.run_margin:
-		change_state("Run")
 	if abs(target.velocity.x) < target.walk_margin:
 		change_state("Idle")
-
-
-func after_update(_delta):
-	pass
-
-
-func before_exit():
-	pass
-
-
-func on_exit():
-	pass
-
-
-func on_timeout(_name):
-	pass
+	elif abs(target.velocity.x) > target.run_margin:
+		if !is_playing("Run"): play("Run")
+	elif target.dir == 0:
+		if !is_playing("Brake"): play("Brake")
+	else:
+		if !is_playing("Walk"): play("Walk")

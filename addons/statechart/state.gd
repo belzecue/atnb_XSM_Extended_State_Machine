@@ -48,9 +48,13 @@ func init_states(root_state, first_branch):
 
 
 func _get_configuration_warning():
+	if is_root() && !active:
+		return "Warning : Your root State is not active. Activate to have it work"
 	for c in get_children():
 		if c.get_class() != "State":
 			return "Error : this Node has a non State child (%s)" %c.get_name()
+	if is_root() && anim_players.size() == 0:
+		return "Warning : Your root State has no AnimationPlayer registered (check your inspector)"
 	return ""
 
 
@@ -192,10 +196,15 @@ func anim_player(new_name):
 	return null
 
 
-func play(new_anim, new_anim_player = ""):
-	var ap = anim_player(new_anim_player)
-	if ap != null && ap.has_animation(new_anim) :
-		if ap.current_animation != new_anim: ap.play(new_anim)
+func play(anim, anim_player = ""):
+	var ap = anim_player(anim_player)
+	if ap != null && ap.has_animation(anim) :
+		if ap.current_animation != anim: ap.play(anim)
+
+
+func is_playing(anim, anim_player = ""):
+	var ap = anim_player(anim_player)
+	return ap.current_animation == anim
 
 
 # TIMERS

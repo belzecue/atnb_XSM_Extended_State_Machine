@@ -4,28 +4,9 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func on_enter():
-	pass
-
-
-func after_enter():
-	pass
+	play("Crouch")
 
 
 func on_update(_delta):
-	pass
-
-
-func after_update(_delta):
-	pass
-
-
-func before_exit():
-	pass
-
-
-func on_exit():
-	pass
-
-
-func on_timeout(_name):
-	pass
+	if Input.is_action_just_released("crouch"):
+		change_state("Idle")
