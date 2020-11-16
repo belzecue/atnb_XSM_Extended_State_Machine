@@ -258,11 +258,11 @@ func after_enter():
 	pass
 
 
-func on_update(delta):
+func on_update(_delta):
 	pass
 
 
-func after_update(delta):
+func after_update(_delta):
 	pass
 
 
@@ -274,5 +274,5 @@ func on_exit():
 	pass
 
 
-func on_timeout(name):
+func on_timeout(_name):
 	pass

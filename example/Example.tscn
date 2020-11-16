@@ -238,7 +238,6 @@ shape = SubResource( 1 )
 [node name="Sprite" type="Sprite" parent="Player"]
 texture = ExtResource( 1 )
 hframes = 7
-frame = 5
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
 anims/Brake = SubResource( 2 )
@@ -279,10 +278,8 @@ anim_players = [  ]
 [node name="Idle" type="Node" parent="Player/XSM/Movement/OnGround"]
 script = ExtResource( 16 )
 active = true
-has_regions = false
 is_fallback = true
 fsm_owner = null
-anim_players = [  ]
 
 [node name="Land" type="Node" parent="Player/XSM/Movement/OnGround"]
 script = ExtResource( 15 )
