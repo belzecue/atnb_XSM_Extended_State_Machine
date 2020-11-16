@@ -3,9 +3,9 @@ extends State
 
 
 # FUNCTIONS TO INHERIT #
-func on_enter():
+func _on_enter():
 	play("Land")
 
 
-func on_landed():
+func _on_AnimationPlayer_animation_finished(_anim_name):
 	change_state("Idle")

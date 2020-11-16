@@ -27,7 +27,7 @@ _global_script_class_icons={
 [application]
 
 config/name="XSM Extended State Machine"
-run/main_scene="res://example/Example.tscn"
+run/main_scene="res://example/example.tscn"
 config/icon="res://icon.png"
 
 [display]

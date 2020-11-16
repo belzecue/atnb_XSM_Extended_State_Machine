@@ -6,13 +6,13 @@ var jumping = false
 
 
 # FUNCTIONS TO INHERIT #
-func on_enter():
+func _on_enter():
 	play("Jump")
 	add_timer("JumpTimer", target.jump_time)
 	jumping = true
 
 
-func on_update(_delta):
+func _on_update(_delta):
 	if Input.is_action_just_released("jump"):
 		jumping = false
 
@@ -22,14 +22,14 @@ func on_update(_delta):
 			jumping = false
 
 
-func on_exit():
+func _on_exit():
 	jumping = false
 
 
-func on_jump_finished():
+func _on_jump_finished():
 	play("FlyUp")
 
 
-func on_timeout(_name):
+func _on_timeout(_name):
 	jumping = false
 	change_state("Fall")

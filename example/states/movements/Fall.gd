@@ -3,12 +3,12 @@ extends State
 
 
 # FUNCTIONS TO INHERIT #
-func on_enter():
+func _on_enter():
 	if target.velocity.y >= 0: play("Fall")
 	else: play("FlyUp")
 
 
-func on_update(_delta):
+func _on_update(_delta):
 	if target.is_on_floor() && get_node_or_null("PreJump") != null:
 		change_state("Jump")
 		return
@@ -25,5 +25,5 @@ func on_update(_delta):
 		add_timer("PreJump",target.prejump_time)
 
 
-func on_finished_topcurve():
-		play("Fall")
+func _on_AnimationPlayer_animation_finished(_anim_name):
+	play("Fall")
