@@ -281,6 +281,8 @@ animation_player = null
 [node name="Idle" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 6 )
 is_fallback = true
+fsm_owner = null
+animation_player = null
 
 [node name="Land" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 5 )
@@ -300,50 +302,43 @@ animation_player = null
 
 [node name="Crouch" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 11 )
-active = false
-has_regions = false
-is_fallback = false
 fsm_owner = null
 animation_player = null
 
 [node name="InAir" type="Node" parent="Player/XSM/RegionMovement"]
 script = ExtResource( 8 )
-active = false
-has_regions = false
-is_fallback = false
 fsm_owner = null
 animation_player = null
 
 [node name="Fall" type="Node" parent="Player/XSM/RegionMovement/InAir"]
 script = ExtResource( 17 )
-active = false
-has_regions = false
-is_fallback = false
 fsm_owner = null
 animation_player = null
 
 [node name="Jump" type="Node" parent="Player/XSM/RegionMovement/InAir"]
 script = ExtResource( 12 )
-active = false
-has_regions = false
-is_fallback = false
 fsm_owner = null
 animation_player = null
 
 [node name="RegionColor" type="Node" parent="Player/XSM"]
 script = ExtResource( 2 )
+fsm_owner = null
+animation_player = null
 
 [node name="Purple" type="Node" parent="Player/XSM/RegionColor"]
 script = ExtResource( 14 )
 fsm_owner = NodePath("../../../Sprite")
+animation_player = null
 
 [node name="Green" type="Node" parent="Player/XSM/RegionColor"]
 script = ExtResource( 13 )
 fsm_owner = NodePath("../../../Sprite")
+animation_player = null
 
 [node name="Orange" type="Node" parent="Player/XSM/RegionColor"]
 script = ExtResource( 16 )
 fsm_owner = NodePath("../../../Sprite")
+animation_player = null
 
 [node name="Platforms" type="Node2D" parent="."]
 position = Vector2( 512, 300 )
