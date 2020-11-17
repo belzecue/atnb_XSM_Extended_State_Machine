@@ -12,8 +12,8 @@ A Finite State Machine (FSM) is a way for developpers to separate their code's l
 If a State has_regions, all its children are active or inactive at the same time, as soon as it is active or inactive.
 
 It allows schemas such as :
-<img src="https://cloud.lail.fr/remote.php/webdav/Public/statechart_composition.svg" alt="statechart" width="400"/>
-<img src="https://cloud.lail.fr/remote.php/webdav/Public/statechart_regions.svg" alt="statechart" width="150"/>
+<img src="example/readme_files/stateschart_composition.svg" alt="statechart" width="400"/>
+<img src="example/readme_files/stateschart_regions.svg" alt="statechart" width="150"/>
 
 _more on : [StateCharts](https://statecharts.github.io/what-is-a-statechart.html)_
 
