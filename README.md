@@ -12,8 +12,8 @@ A Finite State Machine (FSM) is a way for developpers to separate their code's l
 If a State has_regions, all its children are active or inactive at the same time, as soon as it is active or inactive.
 
 It allows schemas such as :
-<img src="https://statecharts.github.io/on-off-delayed-exit-1.svg" alt="statechart" width="200"/>
-<img src="https://statecharts.github.io/glossary/parallel.svg" alt="statechart" width="200"/>
+<img src="https://cloud.lail.fr/s/T6LPg8qFzjaNpix" alt="statechart" width="400"/>
+<img src="https://cloud.lail.fr/s/AZBNCKgYsnwRsYi" alt="statechart" width="150"/>
 
 _more on : [StateCharts](https://statecharts.github.io/what-is-a-statechart.html)_
 
@@ -30,7 +30,7 @@ By default, your XSM is not activated, you should activate it (check your root n
 Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM wiil get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
 
 
-** Abstract functions to inherit in you states **
+**Abstract functions to inherit in you states**
 
 When you enter a State (with `change_state("State")`), XSM will first exit the old branch. Starting from the common root of the new State and the old one, it will call `_before_exit()`, exit the children, then call `_on_exit()`.
 Then it will enter the new branch. Starting from the common root of the new State and the old State, it will call `_on_enter()`, enter the proper child, then call `_after_enter()` for the child and eventually `_after_enter()` for the root. If the specified State is not the last of the branch, XSM is going to enter each following first chid.
@@ -79,3 +79,10 @@ In any State node, you can call the following public functions:
    returns true if there is a Timer "Name" running in this State
 
 
+What's next ?
+-----------------
+
+Well now you can create open source games with Godot and share, right ?
+
+For any question, issue or request, `atn@lail.fr` or gitlab.
+_See you_
