@@ -1,3 +1,6 @@
-# kickit
+# XSM Extended State Machine README.md file
+# made by ATN
 
-KickIt
+XSM Extended State Machine
+==========================
+
