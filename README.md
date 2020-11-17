@@ -12,9 +12,10 @@ A Finite State Machine (FSM) is a way for developpers to separate their code's l
 If a State has_regions, all its children are active or inactive at the same time, as soon as it is active or inactive.
 
 It allows schemas such as :
-![Image](https://statecharts.github.io/on-off-delayed-exit-1.svg "statechart")
-![Image](https://statecharts.github.io/glossary/parallel.svg "statechart")
-more on : [StateCharts](https://statecharts.github.io/what-is-a-statechart.html)
+<img src="https://statecharts.github.io/on-off-delayed-exit-1.svg" alt="statechart" width="200"/>
+<img src="https://statecharts.github.io/glossary/parallel.svg" alt="statechart" width="200"/>
+
+_more on : [StateCharts](https://statecharts.github.io/what-is-a-statechart.html)_
 
 
 How to use XSM
@@ -53,21 +54,28 @@ So, in each State's script, you can implement the following abstract public func
 In any State node, you can call the following public functions:
 
 * `change_state("MyState")`
-...where "MyState" is the name of an existing Node State
+   where "MyState" is the name of an existing Node State
+
 * `is_active("MyState") -> bool`
-...returns true if a state "MyState" is active in this xsm
+   returns true if a state "MyState" is active in this xsm
+
 * `play("Anim")`
-...plays the animation "Anim" of the State's AnimationPlayer
+   plays the animation "Anim" of the State's AnimationPlayer
+
 * `stop()`
-...stops the current animation
+   stops the current animation
+
 * `is_playing("Anim)`
-...returns true if "Anim" is playing
-#  add_timer("Name", time)
-	adds a timer named "Name" and returns this timer
-#   when the time is out, the function _on_timeout(_name) is called
-#  del_timer("Name")
-#   deletes the timer "Name"
-#  is_timer("Name")
-#   returns true if there is a Timer "Name" running in this State
+   returns true if "Anim" is playing
+
+* `add_timer("Name", time)`
+   adds a timer named "Name" and returns this timer
+   when the time is out, the function `_on_timeout(_name)` is called
+   
+* `del_timer("Name")`
+   deletes the timer "Name"
+   
+* `is_timer("Name")`
+   returns true if there is a Timer "Name" running in this State
 
 
