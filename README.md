@@ -48,19 +48,20 @@ So, in each State's script, you can implement the following abstract public func
 ```
 
 
-** Utility functions to call in your States **
+**Utility functions to call in your States**
 
 In any State node, you can call the following public functions:
+
 * `change_state("MyState")`
-	where "MyState" is the name of an existing Node State
+...where "MyState" is the name of an existing Node State
 * `is_active("MyState") -> bool`
-	returns true if a state "MyState" is active in this xsm
+...returns true if a state "MyState" is active in this xsm
 * `play("Anim")`
-	plays the animation "Anim" of the State's AnimationPlayer
+...plays the animation "Anim" of the State's AnimationPlayer
 * `stop()`
-	stops the current animation
+...stops the current animation
 * `is_playing("Anim)`
-	returns true if "Anim" is playing
+...returns true if "Anim" is playing
 #  add_timer("Name", time)
 	adds a timer named "Name" and returns this timer
 #   when the time is out, the function _on_timeout(_name) is called
