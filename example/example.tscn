@@ -140,7 +140,7 @@ tracks/0/keys = {
 "values": [ 3 ]
 }
 tracks/1/type = "method"
-tracks/1/path = NodePath("XSM/Movement/OnGround/Land")
+tracks/1/path = NodePath("XSM/RegionMovement/OnGround/Land")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
@@ -186,7 +186,7 @@ tracks/0/keys = {
 "values": [ 0, 1, 0 ]
 }
 tracks/1/type = "method"
-tracks/1/path = NodePath("XSM/Movement/InAir/Fall")
+tracks/1/path = NodePath("XSM/RegionMovement/InAir/Fall")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
@@ -265,7 +265,7 @@ is_fallback = true
 fsm_owner = NodePath("..")
 animation_player = NodePath("../AnimationPlayer")
 
-[node name="Movement" type="Node" parent="Player/XSM"]
+[node name="RegionMovement" type="Node" parent="Player/XSM"]
 script = ExtResource( 15 )
 active = false
 has_regions = false
@@ -273,21 +273,16 @@ is_fallback = false
 fsm_owner = null
 animation_player = null
 
-[node name="OnGround" type="Node" parent="Player/XSM/Movement"]
+[node name="OnGround" type="Node" parent="Player/XSM/RegionMovement"]
 script = ExtResource( 4 )
-active = false
-has_regions = false
-is_fallback = false
 fsm_owner = null
 animation_player = null
 
-[node name="Idle" type="Node" parent="Player/XSM/Movement/OnGround"]
+[node name="Idle" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 6 )
 is_fallback = true
-fsm_owner = null
-animation_player = null
 
-[node name="Land" type="Node" parent="Player/XSM/Movement/OnGround"]
+[node name="Land" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 5 )
 active = false
 has_regions = false
@@ -295,7 +290,7 @@ is_fallback = false
 fsm_owner = null
 animation_player = null
 
-[node name="Walk" type="Node" parent="Player/XSM/Movement/OnGround"]
+[node name="Walk" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 9 )
 active = false
 has_regions = false
@@ -303,7 +298,7 @@ is_fallback = false
 fsm_owner = null
 animation_player = null
 
-[node name="Crouch" type="Node" parent="Player/XSM/Movement/OnGround"]
+[node name="Crouch" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 11 )
 active = false
 has_regions = false
@@ -311,7 +306,7 @@ is_fallback = false
 fsm_owner = null
 animation_player = null
 
-[node name="InAir" type="Node" parent="Player/XSM/Movement"]
+[node name="InAir" type="Node" parent="Player/XSM/RegionMovement"]
 script = ExtResource( 8 )
 active = false
 has_regions = false
@@ -319,7 +314,7 @@ is_fallback = false
 fsm_owner = null
 animation_player = null
 
-[node name="Fall" type="Node" parent="Player/XSM/Movement/InAir"]
+[node name="Fall" type="Node" parent="Player/XSM/RegionMovement/InAir"]
 script = ExtResource( 17 )
 active = false
 has_regions = false
@@ -327,7 +322,7 @@ is_fallback = false
 fsm_owner = null
 animation_player = null
 
-[node name="Jump" type="Node" parent="Player/XSM/Movement/InAir"]
+[node name="Jump" type="Node" parent="Player/XSM/RegionMovement/InAir"]
 script = ExtResource( 12 )
 active = false
 has_regions = false
@@ -335,25 +330,20 @@ is_fallback = false
 fsm_owner = null
 animation_player = null
 
-[node name="Color" type="Node" parent="Player/XSM"]
+[node name="RegionColor" type="Node" parent="Player/XSM"]
 script = ExtResource( 2 )
-fsm_owner = null
-animation_player = null
 
-[node name="Purple" type="Node" parent="Player/XSM/Color"]
+[node name="Purple" type="Node" parent="Player/XSM/RegionColor"]
 script = ExtResource( 14 )
 fsm_owner = NodePath("../../../Sprite")
-animation_player = null
 
-[node name="Green" type="Node" parent="Player/XSM/Color"]
+[node name="Green" type="Node" parent="Player/XSM/RegionColor"]
 script = ExtResource( 13 )
 fsm_owner = NodePath("../../../Sprite")
-animation_player = null
 
-[node name="Orange" type="Node" parent="Player/XSM/Color"]
+[node name="Orange" type="Node" parent="Player/XSM/RegionColor"]
 script = ExtResource( 16 )
 fsm_owner = NodePath("../../../Sprite")
-animation_player = null
 
 [node name="Platforms" type="Node2D" parent="."]
 position = Vector2( 512, 300 )

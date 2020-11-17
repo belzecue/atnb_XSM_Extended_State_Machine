@@ -3,6 +3,9 @@ class_name State
 extends Node
 # To use this plugin, you should inherit this class to add scripts to your nodes
 # This kind of an implementation https://statecharts.github.io
+# The two main differences with a classic fsm are:
+#   The composition of states and substates
+#   The regions (sibling states that stay active at the same time)
 #
 # Your script can implement those abstract functions:
 #  func _on_enter() -> void:
@@ -13,12 +16,14 @@ extends Node
 #  func _on_exit() -> void:
 #  func _on_timeout(_name) -> void:
 #
-# Connect the animation_finished signal of AnimationPlayer to your States
-# if you wxant to act (ie change State) after an animation
+# Call a method to your State in the intended track of AnimationPlayer
+# if you want to act (ie change State) after or during an animation
 #
 # In those scripts, you can call the public functions:
 #  change_state("MyState")
 #   "MyState" is the name of an existing Node State
+#  is_active("MyState") -> bool
+#   returns true if a state "MyState" is active in this xsm
 #  play("Anim")
 #   plays the animation "Anim" of the State's AnimationPlayer
 #  stop()
@@ -30,6 +35,8 @@ extends Node
 #   when the time is out, the function _on_timeout(_name) is called
 #  del_timer("Name")
 #   deletes the timer "Name"
+#  is_timer("Name")
+#   returns true if there is a Timer "Name" running in this State
 
 
 signal state_entered(sender)
@@ -174,6 +181,13 @@ func change_state(new_state) -> void:
 #	print("'%s' -> '%s'" % [get_name(), new_state])
 
 
+func is_active(name) -> bool:
+	var s = find_state_node(name, null)
+	if s == null:
+		return false
+	return s.find_state_node(name, null).active
+
+
 func play(anim) -> void:
 	if anim_player != null and anim_player.has_animation(anim):
 		if anim_player.current_animation != anim:
@@ -208,6 +222,9 @@ func del_timer(name) -> void:
 		get_node(name).queue_free()
 		get_node(name).set_name("to_delete")
 
+
+func is_timer(name) -> bool:
+	return has_node(name)
 
 #
 # PRIVATE FUNCTIONS
