@@ -75,7 +75,10 @@ In any State node, you can call the following public functions:
 * `del_timer("Name")`
    deletes the timer "Name"
    
-* `is_timer("Name")`
+* `del_timers()`
+   deletes all the timers of this State
+   
+* `has_timer("Name")`
    returns true if there is a Timer "Name" running in this State
 
 
