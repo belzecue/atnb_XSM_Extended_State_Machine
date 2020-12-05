@@ -17,7 +17,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "State",
 "language": "GDScript",
-"path": "res://addons/statechart/state.gd"
+"path": "res://addons/xsm/state.gd"
 } ]
 _global_script_class_icons={
 "GitAPI": "",

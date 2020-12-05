@@ -15,10 +15,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 tool
-extends State
+extends EditorPlugin
 
 
-# FUNCTIONS TO INHERIT #
-func _on_update(_delta) -> void:
-	if Input.is_action_just_pressed("exit"):
-		get_tree().quit()
+func _enter_tree():
+	 add_custom_type("State", "Node", preload("state.gd"), preload("icon_statecharts.png"))
+	 pass
+
+
+
+
+
+func _exit_tree():
+	 remove_custom_type("State")
+	 pass

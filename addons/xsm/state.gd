@@ -1,6 +1,23 @@
+# MIT LICENSE Copyright 2020 Etienne Blanc - ATN
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 tool
 class_name State
 extends Node
+
 # To use this plugin, you should inherit this class to add scripts to your nodes
 # This kind of an implementation https://statecharts.github.io
 # The two main differences with a classic fsm are:
@@ -189,8 +206,9 @@ func is_active(name) -> bool:
 
 
 func play(anim) -> void:
-	if anim_player != null and anim_player.has_animation(anim):
+	if active and anim_player != null and anim_player.has_animation(anim):
 		if anim_player.current_animation != anim:
+			anim_player.stop()
 			anim_player.play(anim)
 
 
@@ -219,11 +237,20 @@ func add_timer(name, time) -> Timer:
 
 func del_timer(name) -> void:
 	if has_node(name):
+		get_node(name).stop()
 		get_node(name).queue_free()
 		get_node(name).set_name("to_delete")
 
 
-func is_timer(name) -> bool:
+func del_timers() -> void:
+	for c in get_children():
+		if c is Timer:
+			c.stop()
+			c.queue_free()
+			c.set_name("to_delete")
+
+
+func has_timer(name) -> bool:
 	return has_node(name)
 
 #
@@ -269,15 +296,21 @@ func find_state_node(new_state, just_done) -> State:
 
 func get_common_root(new_state) -> State:
 	var new_path = new_state.get_path()
-	var curr_path = get_path()
-	var common_root_path = ""
-	var i = 0
-	while i < new_path.get_name_count() and i < curr_path.get_name_count():
-		if new_path.get_name(i) != curr_path.get_name(i):
-			break
-		common_root_path = str(common_root_path, "/", new_path.get_name(i))
-		i += 1
-	var result: State = get_node(common_root_path)
+	# TODO should compare with the current ACTIVE path
+	# Get the active path
+	var result: State = new_state
+	while not result.active and not result.is_root():
+		result = result.get_parent()
+
+#	var curr_path = get_path()
+#	var common_root_path = ""
+#	var i = 0
+#	while i < new_path.get_name_count() and i < curr_path.get_name_count():
+#		if new_path.get_name(i) != curr_path.get_name(i):
+#			break
+#		common_root_path = str(common_root_path, "/", new_path.get_name(i))
+#		i += 1
+#	 = get_node(common_root_path)
 	return result
 
 
@@ -297,6 +330,7 @@ func update_active_states(delta) -> void:
 
 func exit() -> void:
 	active = false
+	del_timers()
 	_on_exit()
 	emit_signal("state_exited", self)
 
