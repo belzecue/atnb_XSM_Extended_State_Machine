@@ -54,6 +54,8 @@ extends Node
 #   deletes the timer "Name"
 #  is_timer("Name")
 #   returns true if there is a Timer "Name" running in this State
+#  get_active_substate()
+#   returns the active substate (all the children if has_regions)
 
 
 signal state_entered(sender)
@@ -72,7 +74,6 @@ var anim_player : AnimationPlayer = null
 var last_state : State = null
 var fallback : State = null
 var done_for_this_frame = false
-
 
 #
 # INIT
@@ -203,6 +204,17 @@ func is_active(name) -> bool:
 	if s == null:
 		return false
 	return s.find_state_node(name, null).active
+
+
+# returns the first active substate or all children if has_regions
+func get_active_substate():
+	if has_regions and active:
+		return get_children()
+	else:
+		for c in get_children():
+			if c.active:
+				return c
+	return null
 
 
 func play(anim) -> void:
