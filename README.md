@@ -80,6 +80,9 @@ In any State node, you can call the following public functions:
    
 * `has_timer("Name")`
    returns true if there is a Timer "Name" running in this State
+   
+* `get_active_substate()`
+   if active, returns the active substate (or all the children if has_regions)
 
 
 What's next ?
