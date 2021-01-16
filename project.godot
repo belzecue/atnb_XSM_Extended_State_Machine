@@ -18,10 +18,16 @@ _global_script_classes=[ {
 "class": "State",
 "language": "GDScript",
 "path": "res://addons/xsm/state.gd"
+}, {
+"base": "State",
+"class": "StateRoot",
+"language": "GDScript",
+"path": "res://addons/xsm/state_root.gd"
 } ]
 _global_script_class_icons={
 "GitAPI": "",
-"State": ""
+"State": "",
+"StateRoot": ""
 }
 
 [application]
@@ -37,7 +43,7 @@ window/stretch/aspect="keep"
 
 [editor_plugins]
 
-enabled=PoolStringArray(  )
+enabled=PoolStringArray( "xsm" )
 
 [gdnative]
 

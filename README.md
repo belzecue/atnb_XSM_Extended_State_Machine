@@ -21,11 +21,11 @@ _more on : [StateCharts](https://statecharts.github.io/what-is-a-statechart.html
 How to use XSM
 ---------------
 
-You can add a State node to your scene. This State wiil be the root of your XSM. Then you can add different States to this root and separate the logic of your scene into those different sub-States.
+You can add a StateRoot node to your scene. This State wiil be the root of your XSM. Then you can add different States to this root and separate the logic of your scene into those different sub-States. You can also add a State as a child of another State and create complex trees of States by doing so.
 
 An empty State template is provided in [res://script_template/empty_state.gd](https://gitlab.com/atnb/xsm/-/blob/master/script_templates/empty_state.gd). You just need to add a script to your State and specify this one as a model.
 
-By default, your XSM is not activated, you should activate it (check your root node's inspector) to have it work.
+By default, your XSM is enabled, you can disable it (or any branch of you XSM's tree) in the inspector.
 
 Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM wiil get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
 
@@ -55,6 +55,9 @@ In any State node, you can call the following public functions:
 
 * `change_state("MyState")`
    where "MyState" is the name of an existing Node State
+
+* `goto_state("MyState")`
+   an alias for change_state()
 
 * `is_active("MyState") -> bool`
    returns true if a state "MyState" is active in this xsm

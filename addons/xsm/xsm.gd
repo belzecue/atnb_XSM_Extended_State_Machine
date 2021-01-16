@@ -19,13 +19,11 @@ extends EditorPlugin
 
 
 func _enter_tree():
-	 add_custom_type("State", "Node", preload("state.gd"), preload("icon_statecharts.png"))
-	 pass
-
-
-
+	 add_custom_type("State", "Node", load("res://addons/xsm/state.gd"), 		load("res://addons/xsm/icon_statecharts.png"))
+	 add_custom_type("StateRoot", "Node", load("res://addons/xsm/state_root.gd"), 		load("res://addons/xsm/icon_statecharts.png"))
 
 
 func _exit_tree():
+	 remove_custom_type("StateRoot")
 	 remove_custom_type("State")
-	 pass
+

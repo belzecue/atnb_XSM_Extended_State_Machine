@@ -62,18 +62,22 @@ signal state_entered(sender)
 signal state_exited(sender)
 signal state_updated(sender)
 signal state_changed(sender)
+signal disabled()
+signal enabled()
 
-export var active = false
+export var disabled = false setget set_disabled
 export var has_regions = false
-export var is_fallback = false
+#export var is_fallback = false
 export(NodePath) var fsm_owner = null
 export(NodePath) var animation_player = null
 
+var active = false
+var state_root = null
 var target : Node = null
 var anim_player : AnimationPlayer = null
 var last_state : State = null
-var fallback : State = null
 var done_for_this_frame = false
+var state_in_update = false
 
 #
 # INIT
@@ -81,45 +85,26 @@ var done_for_this_frame = false
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
-	if is_root() and active:
-		if fsm_owner != null:
-			target = get_node(fsm_owner)
-		elif get_parent() != null:
-			target = get_parent()
+	if fsm_owner != null:
+		target = get_node(fsm_owner)
+	if animation_player != null:
+		anim_player = get_node(animation_player)
 
-		if animation_player != null:
-			anim_player = get_node(animation_player)
-		elif get_parent() != null:
-			for sibling in get_parent().get_children():
-				if sibling is AnimationPlayer:
-					anim_player = sibling
-					break
-
-		is_fallback = true
-		last_state = self
-		init_children_states(self, true)
-		change_state("") # TODO remove
 
 
 func _get_configuration_warning() -> String:
 	for c in get_children():
 		if c.get_class() != "State":
 			return "Error : this Node has a non State child (%s)" % c.get_name()
-	if is_root() and !active:
-		return "Warning : Your root State is not active. It will not work"
-	if is_root() and fsm_owner == null:
-		return "Warning : Your root State has no target"
-	if is_root() and animation_player == null:
-		return "Warning : Your root State has no AnimationPlayer registered"
 	return ""
 
 
-func _physics_process(delta) -> void:
-	if Engine.is_editor_hint():
-		return
-	if is_root() and active:
-		reset_done_this_frame(false)
-		update_active_states(delta)
+func set_disabled(new_disabled) -> void:
+	disabled = new_disabled
+	if disabled:
+		emit_signal("disabled")
+	else:
+		emit_signal("enabled")
 
 
 #
@@ -157,21 +142,23 @@ func _on_timeout(_name) -> void:
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
 func change_state(new_state) -> void:
+	if not state_in_update:
+		state_root.new_pending_state(new_state)
+
 	if done_for_this_frame:
 		return
 
-	# if empty, go to fallback or itself
+	# if empty, go to itself
 	if new_state == "":
-		if fallback != null:
-			new_state = fallback.get_name()
-		else:
-			new_state = get_name()
+		new_state = get_name()
 
 	# finds the path to next state, return if null or active
 	var new_state_node = find_state_node(new_state, null)
 	if new_state_node == null:
 		return
 	if new_state != get_name() and new_state_node.active:
+		return
+	if new_state_node.disabled:
 		return
 
 	# compare the current path and the new one -> get the common_root
@@ -185,10 +172,6 @@ func change_state(new_state) -> void:
 	common_root.enter_children(new_state_node.get_path())
 
 	# sets this State as last_state for the new one
-	if is_fallback:
-		new_state_node.fallback = self
-	else:
-		new_state_node.fallback = fallback
 	new_state_node.last_state = self
 
 	# set "done this frame" to avoid another round of state change in this branch
@@ -196,7 +179,13 @@ func change_state(new_state) -> void:
 
 	# signal the change
 	emit_signal("state_changed", self)
+	state_root.emit_signal("substate_changed", self)
 #	print("'%s' -> '%s'" % [get_name(), new_state])
+
+
+# New function name
+func goto_state(new_state) -> void:
+	change_state(new_state)
 
 
 func is_active(name) -> bool:
@@ -272,16 +261,12 @@ func init_children_states(root_state, first_branch) -> void:
 	for c in get_children():
 		if c.get_class() == "State":
 			c.active = false
-			if c.fsm_owner != null:
-				c.target = c.get_node(c.fsm_owner)
-			else:
+			c.state_root = root_state
+			if c.target == null:
 				c.target = root_state.target
-			if c.animation_player != null:
-				c.anim_player = c.get_node(c.animation_player)
-			else:
+			if c.anim_player == null:
 				c.anim_player = root_state.anim_player
-			c.fallback = root_state
-			if first_branch and ( has_regions or c == get_child(0)):
+			if first_branch and ( has_regions or c == get_child(0) ):
 				c.active = true
 				c.last_state = root_state
 				c.init_children_states(root_state, true)
@@ -313,16 +298,6 @@ func get_common_root(new_state) -> State:
 	var result: State = new_state
 	while not result.active and not result.is_root():
 		result = result.get_parent()
-
-#	var curr_path = get_path()
-#	var common_root_path = ""
-#	var i = 0
-#	while i < new_path.get_name_count() and i < curr_path.get_name_count():
-#		if new_path.get_name(i) != curr_path.get_name(i):
-#			break
-#		common_root_path = str(common_root_path, "/", new_path.get_name(i))
-#		i += 1
-#	 = get_node(common_root_path)
 	return result
 
 
@@ -330,14 +305,19 @@ func update(delta) -> void:
 	if active:
 		_on_update(delta)
 		emit_signal("state_updated", self)
+		state_root.emit_signal("substate_updated", self)
 
 
 func update_active_states(delta) -> void:
+	if disabled:
+		return
+	state_in_update = true
 	update(delta)
 	for c in get_children():
 		if c.get_class() == "State" and c.active and !c.done_for_this_frame:
 			c.update_active_states(delta)
 	_after_update(delta)
+	state_in_update = false
 
 
 func exit() -> void:
@@ -345,6 +325,7 @@ func exit() -> void:
 	del_timers()
 	_on_exit()
 	emit_signal("state_exited", self)
+	state_root.emit_signal("substate_exited", self)
 
 
 func exit_children() -> void:
@@ -359,6 +340,7 @@ func enter() -> void:
 	active = true
 	_on_enter()
 	emit_signal("state_entered", self)
+	state_root.emit_signal("substate_entered", self)
 
 
 func enter_children(new_state_path) -> void:
@@ -412,4 +394,4 @@ func is_atomic() -> bool:
 
 
 func is_root() -> bool:
-	return get_parent().get_class() != "State"
+	return false
