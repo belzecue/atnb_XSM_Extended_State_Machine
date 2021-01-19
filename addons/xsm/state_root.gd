@@ -23,11 +23,9 @@ extends State
 # This node will probably expand a bit in the next versions of XSM
 
 
-signal substate_entered(sender)
-signal substate_exited(sender)
-signal substate_updated(sender)
-signal substate_changed(sender)
-signal pending_state_changed()
+signal some_state_changed(sender, new_state_node)
+signal pending_state_changed(added_state_node)
+signal pending_state_added(new_state_name)
 
 var pending_states = []
 
@@ -60,8 +58,8 @@ func _physics_process(delta) -> void:
 		while pending_states.size() > 0:
 			state_in_update = true
 			var new_state = pending_states.pop_front()
-			change_state(new_state)
-			emit_signal("pending_state_changed", new_state)
+			var new_state_node = change_state(new_state)
+			emit_signal("pending_state_changed", new_state_node)
 			state_in_update = false
 		update_active_states(delta)
 
@@ -69,8 +67,9 @@ func _physics_process(delta) -> void:
 #
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
-func new_pending_state(new_state) -> void:
-	pending_states.append(new_state)
+func new_pending_state(new_state_name) -> void:
+	pending_states.append(new_state_name)
+	emit_signal("pending_state_added", new_state_name)
 
 
 #

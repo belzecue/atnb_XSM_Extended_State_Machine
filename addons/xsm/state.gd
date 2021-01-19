@@ -58,10 +58,13 @@ extends Node
 #   returns the active substate (all the children if has_regions)
 
 
-signal state_entered(sender)
-signal state_exited(sender)
-signal state_updated(sender)
-signal state_changed(sender)
+signal state_entered(sender, new_state)
+signal state_exited(sender, new_state)
+signal state_updated(sender, new_state)
+signal state_changed(sender, new_state)
+signal substate_entered(sender)
+signal substate_exited(sender)
+signal substate_changed(sender)
 signal disabled()
 signal enabled()
 
@@ -141,12 +144,12 @@ func _on_timeout(_name) -> void:
 #
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
-func change_state(new_state) -> void:
+func change_state(new_state) -> State:
 	if not state_in_update:
 		state_root.new_pending_state(new_state)
 
 	if done_for_this_frame:
-		return
+		return null
 
 	# if empty, go to itself
 	if new_state == "":
@@ -155,11 +158,11 @@ func change_state(new_state) -> void:
 	# finds the path to next state, return if null or active
 	var new_state_node = find_state_node(new_state, null)
 	if new_state_node == null:
-		return
+		return null
 	if new_state != get_name() and new_state_node.active:
-		return
+		return null
 	if new_state_node.disabled:
-		return
+		return null
 
 	# compare the current path and the new one -> get the common_root
 	var common_root = get_common_root(new_state_node)
@@ -179,7 +182,10 @@ func change_state(new_state) -> void:
 
 	# signal the change
 	emit_signal("state_changed", self)
-	state_root.emit_signal("substate_changed", self)
+	if not is_root() :
+		new_state_node.get_parent().emit_signal("substate_changed", new_state_node)
+	state_root.emit_signal("some_state_changed", self, new_state_node)
+	return new_state_node
 #	print("'%s' -> '%s'" % [get_name(), new_state])
 
 
@@ -293,8 +299,6 @@ func find_state_node(new_state, just_done) -> State:
 
 func get_common_root(new_state) -> State:
 	var new_path = new_state.get_path()
-	# TODO should compare with the current ACTIVE path
-	# Get the active path
 	var result: State = new_state
 	while not result.active and not result.is_root():
 		result = result.get_parent()
@@ -305,7 +309,6 @@ func update(delta) -> void:
 	if active:
 		_on_update(delta)
 		emit_signal("state_updated", self)
-		state_root.emit_signal("substate_updated", self)
 
 
 func update_active_states(delta) -> void:
@@ -325,7 +328,8 @@ func exit() -> void:
 	del_timers()
 	_on_exit()
 	emit_signal("state_exited", self)
-	state_root.emit_signal("substate_exited", self)
+	if not is_root():
+		get_parent().emit_signal("substate_exited", self)
 
 
 func exit_children() -> void:
@@ -340,7 +344,8 @@ func enter() -> void:
 	active = true
 	_on_enter()
 	emit_signal("state_entered", self)
-	state_root.emit_signal("substate_entered", self)
+	if not is_root():
+		get_parent().emit_signal("substate_entered", self)
 
 
 func enter_children(new_state_path) -> void:

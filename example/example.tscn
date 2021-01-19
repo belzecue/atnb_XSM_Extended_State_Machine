@@ -265,13 +265,13 @@ animation_player = NodePath("../AnimationPlayer")
 
 [node name="RegionMovement" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 15 )
-
-[node name="OnGround" type="Node" parent="Player/StateRoot/RegionMovement"]
-script = ExtResource( 4 )
 disabled = false
 has_regions = false
 fsm_owner = null
 animation_player = null
+
+[node name="OnGround" type="Node" parent="Player/StateRoot/RegionMovement"]
+script = ExtResource( 4 )
 
 [node name="Idle" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 6 )
@@ -303,9 +303,17 @@ animation_player = null
 
 [node name="InAir" type="Node" parent="Player/StateRoot/RegionMovement"]
 script = ExtResource( 8 )
+disabled = false
+has_regions = false
+fsm_owner = null
+animation_player = null
 
 [node name="Fall" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
 script = ExtResource( 17 )
+disabled = false
+has_regions = false
+fsm_owner = null
+animation_player = null
 
 [node name="Jump" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
 script = ExtResource( 12 )
