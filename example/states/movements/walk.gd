@@ -3,13 +3,13 @@ extends State
 
 
 # FUNCTIONS TO INHERIT #
-func _on_enter():
+func _on_enter(_args):
 	play("Walk")
 
 
 func _on_update(_delta):
 	if abs(target.velocity.x) < target.walk_margin:
-		change_state("Idle")
+		var _s = change_state("Idle")
 	elif abs(target.velocity.x) > target.run_margin:
 		if !is_playing("Run"): play("Run")
 	elif target.dir == 0:

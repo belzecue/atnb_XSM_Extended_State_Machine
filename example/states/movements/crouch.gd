@@ -3,10 +3,10 @@ extends State
 
 
 # FUNCTIONS TO INHERIT #
-func _on_enter():
+func _on_enter(_args):
 	play("Crouch")
 
 
 func _on_update(_delta):
 	if Input.is_action_just_released("crouch"):
-		change_state("Idle")
+		var _s = change_state("Idle")

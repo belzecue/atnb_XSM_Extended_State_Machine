@@ -13,9 +13,9 @@ func _on_update(delta):
 		if abs(target.velocity.x) < target.walk_margin: target.velocity.x = 0
 
 	if Input.is_action_just_pressed("jump"):
-		change_state("Jump")
+		var _s = change_state("Jump")
 	elif !target.is_on_floor():
 		get_node("../InAir/Fall").add_timer("CoyoteTime", target.coyote_time)
-		change_state("Fall")
+		var _s = change_state("Fall")
 	elif abs(target.velocity.x) < target.walk_margin && Input.is_action_just_pressed("crouch"):
-		change_state("Crouch")
+		var _s = change_state("Crouch")

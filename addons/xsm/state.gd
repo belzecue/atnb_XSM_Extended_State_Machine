@@ -113,11 +113,11 @@ func set_disabled(new_disabled) -> void:
 #
 # FUNCTIONS TO INHERIT
 #
-func _on_enter() -> void:
+func _on_enter(_args) -> void:
 	pass
 
 
-func _after_enter() -> void:
+func _after_enter(_args) -> void:
 	pass
 
 
@@ -129,11 +129,11 @@ func _after_update(_delta) -> void:
 	pass
 
 
-func _before_exit() -> void:
+func _before_exit(_args) -> void:
 	pass
 
 
-func _on_exit() -> void:
+func _on_exit(_args) -> void:
 	pass
 
 
@@ -144,7 +144,8 @@ func _on_timeout(_name) -> void:
 #
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
-func change_state(new_state) -> State:
+func change_state(new_state, args_on_enter = null, args_after_enter = null,
+		args_before_exit = null, args_on_exit = null) -> State:
 	if not state_in_update:
 		state_root.new_pending_state(new_state)
 
@@ -169,10 +170,10 @@ func change_state(new_state) -> State:
 
 	# exits all active children of the old branch,
 	# from farthest to common_root (excluded)
-	common_root.exit_children()
+	common_root.exit_children(args_before_exit, args_on_exit)
 	# enters the nodes of the new branch from the parent to the next_state
 	# enters the first leaf of each following branch
-	common_root.enter_children(new_state_node.get_path())
+	common_root.enter_children(new_state_node.get_path(), args_on_enter, args_after_enter)
 
 	# sets this State as last_state for the new one
 	new_state_node.last_state = self
@@ -323,40 +324,40 @@ func update_active_states(delta) -> void:
 	state_in_update = false
 
 
-func exit() -> void:
+func exit(args = null) -> void:
 	active = false
 	del_timers()
-	_on_exit()
+	_on_exit(args)
 	emit_signal("state_exited", self)
 	if not is_root():
 		get_parent().emit_signal("substate_exited", self)
 
 
-func exit_children() -> void:
+func exit_children(args_before_exit = null, args_on_exit = null) -> void:
 	for c in get_children():
 		if c.get_class() == "State" and c.active:
-			c._before_exit()
+			c._before_exit(args_before_exit)
 			c.exit_children()
-			c.exit()
+			c.exit(args_on_exit)
 
 
-func enter() -> void:
+func enter(args = null) -> void:
 	active = true
-	_on_enter()
+	_on_enter(args)
 	emit_signal("state_entered", self)
 	if not is_root():
 		get_parent().emit_signal("substate_entered", self)
 
 
-func enter_children(new_state_path) -> void:
+func enter_children(new_state_path, args_on_enter = null, args_after_enter = null) -> void:
 	# if hasregions, enter all children and that's all
 	# if newstate's path tall enough, enter child that fits newstate's current lvl
 	# else newstate's path smaller than here, enter first child
 	if has_regions:
 		for c in get_children():
-			c.enter()
-			c.enter_children(new_state_path)
-			c._after_enter()
+			c.enter(args_on_enter)
+			c.enter_children(new_state_path, args_on_enter, args_after_enter)
+			c._after_enter(args_after_enter)
 		return
 
 	var new_state_lvl = new_state_path.get_name_count()
@@ -365,16 +366,16 @@ func enter_children(new_state_path) -> void:
 		for c in get_children():
 			var current_name = new_state_path.get_name(current_lvl)
 			if c.get_class() == "State" and c.get_name() == current_name:
-				c.enter()
-				c.enter_children(new_state_path)
-				c._after_enter()
+				c.enter(args_on_enter)
+				c.enter_children(new_state_path, args_on_enter, args_after_enter)
+				c._after_enter(args_after_enter)
 	else:
 		if get_child_count() > 0:
 			var c = get_child(0)
 			if get_child(0).get_class() == "State":
-				c.enter()
-				c.enter_children(new_state_path)
-				c._after_enter()
+				c.enter(args_on_enter)
+				c.enter_children(new_state_path, args_on_enter, args_after_enter)
+				c._after_enter(args_after_enter)
 
 
 func _on_timer_timeout(name) -> void:

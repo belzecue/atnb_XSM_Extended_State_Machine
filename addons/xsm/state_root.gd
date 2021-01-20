@@ -38,6 +38,7 @@ func _ready():
 	if fsm_owner == null and get_parent() != null:
 		target = get_parent()
 	init_children_states(self, true)
+	active = true
 
 
 func _get_configuration_warning() -> String:
