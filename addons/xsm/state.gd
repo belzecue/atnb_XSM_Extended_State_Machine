@@ -111,6 +111,22 @@ func set_disabled(new_disabled) -> void:
 		emit_signal("enabled")
 
 
+# Careful, if your substates have the same name,
+# their parents'names must be different
+func children_state_map(dict):
+	for c in get_children():
+		if not dict.has(c.name):
+			dict[c.name] = c
+		else:
+			var curr_state = dict[c.name]
+			var curr_parent = curr_state.get_parent()
+			dict.erase(c.name)
+			dict[str("%s/%s" % [curr_parent.name, c.name])] = curr_state
+			dict[str("%s/%s" % [name, c.name] )] = c
+		if c.get_child_count() > 0:
+			c.children_state_map(dict)
+
+
 #
 # FUNCTIONS TO INHERIT
 #
@@ -275,9 +291,10 @@ func init_children_states(root_state, first_branch) -> void:
 			if c.anim_player == null:
 				c.anim_player = root_state.anim_player
 			if first_branch and ( has_regions or c == get_child(0) ):
-				c.active = true
+				c.enter()
 				c.last_state = root_state
 				c.init_children_states(root_state, true)
+				c._after_enter(null)
 			else:
 				c.init_children_states(root_state, false)
 
@@ -285,18 +302,12 @@ func init_children_states(root_state, first_branch) -> void:
 func find_state_node(new_state, just_done) -> State:
 	if get_name() == new_state:
 		return self
-	var found = null
-	for c in get_children():
-		if c.get_class() == "State" and c != just_done:
-			found = c.find_state_node(new_state,self)
-			if found != null:
-				return found
-	var parent = get_parent()
-	if parent != null and parent.get_class() == "State" and parent != just_done:
-		found = parent.find_state_node(new_state, self)
-		if found != null:
-			return found
-	return found
+
+	var state_map = state_root.state_map
+	if state_map.has(new_state):
+		return state_map[new_state]
+
+	return null
 
 
 func get_common_root(new_state) -> State:

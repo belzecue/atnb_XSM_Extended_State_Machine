@@ -1,6 +1,8 @@
 XSM Extended State Machine
 ==========================
 
+Latest version : 1.3.2
+
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition, regions and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
 
@@ -54,10 +56,13 @@ So, in each State's script, you can implement the following abstract public func
 In any State node, you can call the following public functions:
 
 * `change_state("MyState")`
-   where "MyState" is the name of an existing Node State
+   where "MyState" is the name of an existing Node State. If two states have the same name, you MUST add the parent's name before change_state("Parent/Child")
 
+* `change_state("MyState", args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null)`
+   The "change_state" method accepts arguments, to be able to pass variables to some inherited enter or exit functions in your states' logic.
+   
 * `goto_state("MyState")`
-   an alias for change_state()
+   an alias for change_state(). Attention, no arguments allowed there !
 
 * `is_active("MyState") -> bool`
    returns true if a state "MyState" is active in this xsm

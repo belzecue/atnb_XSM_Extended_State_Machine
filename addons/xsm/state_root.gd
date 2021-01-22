@@ -28,6 +28,7 @@ signal pending_state_changed(added_state_node)
 signal pending_state_added(new_state_name)
 
 var pending_states = []
+var state_map = {}
 
 
 #
@@ -37,6 +38,7 @@ func _ready():
 	state_root = self
 	if fsm_owner == null and get_parent() != null:
 		target = get_parent()
+	init_state_map()
 	init_children_states(self, true)
 	active = true
 
@@ -51,6 +53,16 @@ func _get_configuration_warning() -> String:
 	return ._get_configuration_warning()
 
 
+# Careful, if your substates have the same name,
+# their parents'names must be different
+func init_state_map():
+	children_state_map(state_map)
+	state_map[name] = self
+
+
+#
+# PROCESS
+#
 func _physics_process(delta) -> void:
 	if Engine.is_editor_hint():
 		return
