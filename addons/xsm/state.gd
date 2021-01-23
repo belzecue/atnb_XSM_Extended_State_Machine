@@ -174,7 +174,7 @@ func change_state(new_state, args_on_enter = null, args_after_enter = null,
 		new_state = get_name()
 
 	# finds the path to next state, return if null or active
-	var new_state_node = find_state_node(new_state, null)
+	var new_state_node = find_state_node(new_state)
 	if new_state_node == null:
 		return null
 	if new_state != get_name() and new_state_node.active:
@@ -213,10 +213,10 @@ func goto_state(new_state) -> void:
 
 
 func is_active(name) -> bool:
-	var s = find_state_node(name, null)
+	var s = find_state_node(name)
 	if s == null:
 		return false
-	return s.find_state_node(name, null).active
+	return s.find_state_node(name).active
 
 
 # returns the first active substate or all children if has_regions
@@ -228,6 +228,10 @@ func get_active_substate():
 			if c.active:
 				return c
 	return null
+
+
+func get_state(state_name):
+	return find_state_node(state_name)
 
 
 func play(anim) -> void:
@@ -299,7 +303,7 @@ func init_children_states(root_state, first_branch) -> void:
 				c.init_children_states(root_state, false)
 
 
-func find_state_node(new_state, just_done) -> State:
+func find_state_node(new_state) -> State:
 	if get_name() == new_state:
 		return self
 

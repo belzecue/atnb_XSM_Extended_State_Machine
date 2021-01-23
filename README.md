@@ -41,12 +41,12 @@ If you add any timer to a State (with `add_timer("name",time)`) as soon as the t
 
 So, in each State's script, you can implement the following abstract public functions:
 ```python
-#  func _on_enter() -> void:
-#  func _after_enter() -> void:
+#  func _on_enter(args) -> void:
+#  func _after_enter(args) -> void:
 #  func _on_update(_delta) -> void:
 #  func _after_update(_delta) -> void:
-#  func _before_exit() -> void:
-#  func _on_exit() -> void:
+#  func _before_exit(args) -> void:
+#  func _on_exit(args) -> void:
 #  func _on_timeout(_name) -> void:
 ```
 
@@ -66,6 +66,12 @@ In any State node, you can call the following public functions:
 
 * `is_active("MyState") -> bool`
    returns true if a state "MyState" is active in this xsm
+
+* `find_state_node("MyState") -> State`
+   returns the State Node "MyState", You have to specify "Parent/MyState" if "MyState" is not a unique name.
+
+* `get_state("MyState") -> State`
+   an alias for find_state_node()
 
 * `play("Anim")`
    plays the animation "Anim" of the State's AnimationPlayer
