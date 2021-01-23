@@ -41,6 +41,9 @@ extends Node
 #   "MyState" is the name of an existing Node State
 #  is_active("MyState") -> bool
 #   returns true if a state "MyState" is active in this xsm
+#  get_state("MyState) -> State
+#   returns the State Node "MyState". You have to specify "Parent/MyState" if
+#   "MyState" is not a unique name
 #  play("Anim")
 #   plays the animation "Anim" of the State's AnimationPlayer
 #  stop()
