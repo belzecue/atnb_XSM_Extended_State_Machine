@@ -1,7 +1,7 @@
 XSM Extended State Machine
 ==========================
 
-Latest version : 1.3.2
+Latest version : 1.4.0
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition, regions and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
@@ -23,13 +23,17 @@ _more on : [StateCharts](https://statecharts.github.io/what-is-a-statechart.html
 How to use XSM
 ---------------
 
-You can add a StateRoot node to your scene. This State wiil be the root of your XSM. Then you can add different States to this root and separate the logic of your scene into those different sub-States. You can also add a State as a child of another State and create complex trees of States by doing so.
+You can add a StateRoot node to your scene. This State will be the root of your XSM. Then you can add different States to this root and separate the logic of your scene into those different sub-States. You can also add a State as a child of another State and create complex trees of States by doing so.
 
-An empty State template is provided in [res://script_template/empty_state.gd](https://gitlab.com/atnb/xsm/-/blob/master/script_templates/empty_state.gd). You just need to add a script to your State and specify this one as a model.
+The RootState is a special State that owns a state_map dictionary (contains the list of all the State names as a key and their State node's reference as a value). It also contains a list of all the current active States.
 
 By default, your XSM is enabled, you can disable it (or any branch of you XSM's tree) in the inspector.
 
-Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM wiil get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
+You can us the same names for states in different branches of your StateMachine but THEIR PARENT NAMES MUST BE DIFFERENT. In the state_map and active_states_list, they wiil be referenced as "ParentName/ChildName" to differentiate theme.
+
+Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM will get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
+
+An empty State template is provided in [res://script_template/empty_state.gd](https://gitlab.com/atnb/xsm/-/blob/master/script_templates/empty_state.gd). You just need to add a script to your State and specify this one as a model.
 
 
 **Abstract functions to inherit in you states**
@@ -63,9 +67,15 @@ In any State node, you can call the following public functions:
    
 * `goto_state("MyState")`
    an alias for change_state(). Attention, no arguments allowed there !
-
+   
 * `is_active("MyState") -> bool`
    returns true if a state "MyState" is active in this xsm
+   
+*  `get_active_states() -> Dictionary`
+   returns a dictionary with all the active States
+
+* `get_active_substate()`
+   if active, returns the active substate (or all the children if has_regions)
 
 * `find_state_node("MyState") -> State`
    returns the State Node "MyState", You have to specify "Parent/MyState" if "MyState" is not a unique name.
@@ -94,10 +104,28 @@ In any State node, you can call the following public functions:
    
 * `has_timer("Name")`
    returns true if there is a Timer "Name" running in this State
-   
-* `get_active_substate()`
-   if active, returns the active substate (or all the children if has_regions)
 
+
+**Signals**
+
+The States are calling different signals during their life :
+
+* `signal state_entered(sender, new_state)`
+* `signal state_exited(sender, new_state)`
+* `signal state_updated(sender, new_state)`
+* `signal state_changed(sender, new_state)`
+* `signal substate_entered(sender)`
+* `signal substate_exited(sender)`
+* `signal substate_changed(sender)`
+* `signal disabled()`
+* `signal enabled()`
+
+The StateRoot has additional signals :
+
+* `signal some_state_changed(sender, new_state_node)`
+* `signal pending_state_changed(added_state_node)`
+* `signal pending_state_added(new_state_name)`
+* `signal active_state_list_changed(active_states_list)`
 
 Special Thanks
 -----------------

@@ -26,9 +26,12 @@ extends State
 signal some_state_changed(sender, new_state_node)
 signal pending_state_changed(added_state_node)
 signal pending_state_added(new_state_name)
+signal active_state_list_changed(the_list)
 
-var pending_states = []
-var state_map = {}
+var pending_states := []
+var state_map := {}
+var duplicate_names := {} # Stores number of times a state_name is duplicated
+var active_states := {}
 
 
 #
@@ -40,7 +43,7 @@ func _ready():
 		target = get_parent()
 	init_state_map()
 	init_children_states(self, true)
-	active = true
+	set_active(true)
 
 
 func _get_configuration_warning() -> String:
@@ -55,9 +58,9 @@ func _get_configuration_warning() -> String:
 
 # Careful, if your substates have the same name,
 # their parents'names must be different
-func init_state_map():
-	children_state_map(state_map)
+func init_state_map() -> void:
 	state_map[name] = self
+	init_children_state_map(state_map, self)
 
 
 #
@@ -90,3 +93,18 @@ func new_pending_state(new_state_name) -> void:
 #
 func is_root() -> bool:
 	return true
+
+
+func remove_active_state(state_to_erase) -> void:
+	active_states.erase(state_to_erase)
+	emit_signal("active_state_list_changed", active_states)
+
+
+func add_active_state(state_to_add) -> void:
+	var state_name = state_to_add.name
+	var name_in_state_map = state_name
+	if not state_map.has(state_name):
+		var parent_name = state_to_add.get_parent().name
+		name_in_state_map = str("%s/%s" % [parent_name, state_name])
+	active_states[state_to_add] = name_in_state_map
+	emit_signal("active_state_list_changed", active_states)

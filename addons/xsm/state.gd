@@ -41,6 +41,8 @@ extends Node
 #   "MyState" is the name of an existing Node State
 #  is_active("MyState") -> bool
 #   returns true if a state "MyState" is active in this xsm
+#  get_active_states() -> Dictionary:
+#   returns a dictionary with all the active States
 #  get_state("MyState) -> State
 #   returns the State Node "MyState". You have to specify "Parent/MyState" if
 #   "MyState" is not a unique name
@@ -71,19 +73,19 @@ signal substate_changed(sender)
 signal disabled()
 signal enabled()
 
-export var disabled = false setget set_disabled
-export var has_regions = false
+export var disabled := false setget set_disabled
+export var has_regions := false
 #export var is_fallback = false
 export(NodePath) var fsm_owner = null
 export(NodePath) var animation_player = null
 
-var active = false
-var state_root = null
+var active := false
+var state_root : State = null
 var target : Node = null
 var anim_player : AnimationPlayer = null
 var last_state : State = null
-var done_for_this_frame = false
-var state_in_update = false
+var done_for_this_frame := false
+var state_in_update := false
 
 
 #
@@ -115,19 +117,24 @@ func set_disabled(new_disabled) -> void:
 
 
 # Careful, if your substates have the same name,
-# their parents'names must be different
-func children_state_map(dict):
+# their parents names must be different
+# It would be easier if the state_root name is unique
+func init_children_state_map(dict, new_state_root):
+	state_root = new_state_root
 	for c in get_children():
-		if not dict.has(c.name):
-			dict[c.name] = c
-		else:
+		if dict.has(c.name):
 			var curr_state = dict[c.name]
 			var curr_parent = curr_state.get_parent()
 			dict.erase(c.name)
-			dict[str("%s/%s" % [curr_parent.name, c.name])] = curr_state
-			dict[str("%s/%s" % [name, c.name] )] = c
-		if c.get_child_count() > 0:
-			c.children_state_map(dict)
+			dict[ str("%s/%s" % [curr_parent.name, c.name]) ] = curr_state
+			dict[ str("%s/%s" % [name, c.name]) ] = c
+			state_root.duplicate_names[c.name] = 1
+		elif state_root.duplicate_names.has(c.name):
+			dict[ str("%s/%s" % [name, c.name]) ] = c
+			state_root.duplicate_names[c.name] += 1
+		else:
+			dict[c.name] = c
+		c.init_children_state_map(dict, state_root)
 
 
 #
@@ -206,13 +213,22 @@ func change_state(new_state, args_on_enter = null, args_after_enter = null,
 	if not is_root() :
 		new_state_node.get_parent().emit_signal("substate_changed", new_state_node)
 	state_root.emit_signal("some_state_changed", self, new_state_node)
+	print("'%s' -> '%s'" % [get_name(), new_state])
 	return new_state_node
-#	print("'%s' -> '%s'" % [get_name(), new_state])
 
 
 # New function name
 func goto_state(new_state) -> void:
 	change_state(new_state)
+
+
+func set_active(new_active) -> void:
+	if active and not new_active:
+		active = false
+		state_root.remove_active_state(self)
+	elif new_active and not active:
+		active = true
+		state_root.add_active_state(self)
 
 
 func is_active(name) -> bool:
@@ -233,8 +249,12 @@ func get_active_substate():
 	return null
 
 
-func get_state(state_name):
+func get_state(state_name) -> State:
 	return find_state_node(state_name)
+
+
+func get_active_states() -> Dictionary:
+	return state_root.active_states
 
 
 func play(anim) -> void:
@@ -291,7 +311,7 @@ func has_timer(name) -> bool:
 func init_children_states(root_state, first_branch) -> void:
 	for c in get_children():
 		if c.get_class() == "State":
-			c.active = false
+			c.set_active(false)
 			c.state_root = root_state
 			if c.target == null:
 				c.target = root_state.target
@@ -313,6 +333,12 @@ func find_state_node(new_state) -> State:
 	var state_map = state_root.state_map
 	if state_map.has(new_state):
 		return state_map[new_state]
+
+	if state_root.duplicate_names.has(new_state):
+		if state_map.has( str("%s/%s" % [name, new_state]) ):
+			return state_map[ str("%s/%s" % [name, new_state]) ]
+		elif state_map.has( str("%s/%s" % [get_parent().name, new_state]) ):
+			return state_map[ str("%s/%s" % [get_parent().name, new_state]) ]
 
 	return null
 
@@ -344,7 +370,7 @@ func update_active_states(delta) -> void:
 
 
 func exit(args = null) -> void:
-	active = false
+	set_active(false)
 	del_timers()
 	_on_exit(args)
 	emit_signal("state_exited", self)
@@ -361,7 +387,7 @@ func exit_children(args_before_exit = null, args_on_exit = null) -> void:
 
 
 func enter(args = null) -> void:
-	active = true
+	set_active(true)
 	_on_enter(args)
 	emit_signal("state_entered", self)
 	if not is_root():
