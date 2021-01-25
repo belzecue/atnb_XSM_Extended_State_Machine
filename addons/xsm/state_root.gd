@@ -26,7 +26,7 @@ extends State
 signal some_state_changed(sender, new_state_node)
 signal pending_state_changed(added_state_node)
 signal pending_state_added(new_state_name)
-signal active_state_list_changed(the_list)
+signal active_state_list_changed(active_states_list)
 
 var pending_states := []
 var state_map := {}

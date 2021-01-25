@@ -114,6 +114,12 @@ func set_disabled(new_disabled) -> void:
 		emit_signal("disabled")
 	else:
 		emit_signal("enabled")
+	set_disabled_children(new_disabled)
+
+
+func set_disabled_children(new_disabled):
+	for c in get_children():
+		c.set_disabled(new_disabled)
 
 
 # Careful, if your substates have the same name,
@@ -387,6 +393,8 @@ func exit_children(args_before_exit = null, args_on_exit = null) -> void:
 
 
 func enter(args = null) -> void:
+	if disabled:
+		return
 	set_active(true)
 	_on_enter(args)
 	emit_signal("state_entered", self)
@@ -395,6 +403,8 @@ func enter(args = null) -> void:
 
 
 func enter_children(new_state_path, args_on_enter = null, args_after_enter = null) -> void:
+	if disabled:
+		return
 	# if hasregions, enter all children and that's all
 	# if newstate's path tall enough, enter child that fits newstate's current lvl
 	# else newstate's path smaller than here, enter first child
