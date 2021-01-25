@@ -219,7 +219,7 @@ func change_state(new_state, args_on_enter = null, args_after_enter = null,
 	if not is_root() :
 		new_state_node.get_parent().emit_signal("substate_changed", new_state_node)
 	state_root.emit_signal("some_state_changed", self, new_state_node)
-	print("'%s' -> '%s'" % [get_name(), new_state])
+#	print("'%s' -> '%s'" % [get_name(), new_state])
 	return new_state_node
 
 
