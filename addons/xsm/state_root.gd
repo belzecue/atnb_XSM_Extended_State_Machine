@@ -71,20 +71,35 @@ func _physics_process(delta) -> void:
 		return
 	if not disabled:
 		reset_done_this_frame(false)
-		while pending_states.size() > 0:
+		if pending_states.size() > 0:
 			state_in_update = true
-			var new_state = pending_states.pop_front()
-			var new_state_node = change_state(new_state)
+			var new_state_with_args = pending_states.pop_front()
+			var new_state = new_state_with_args[0]
+			var arg1 = new_state_with_args[1]
+			var arg2 = new_state_with_args[2]
+			var arg3 = new_state_with_args[3]
+			var arg4 = new_state_with_args[4]
+			var new_state_node = change_state(new_state, arg1, arg2, arg3, arg4)
 			emit_signal("pending_state_changed", new_state_node)
 			state_in_update = false
+			pending_states.clear()
 		update_active_states(delta)
 
 
 #
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
-func new_pending_state(new_state_name) -> void:
-	pending_states.append(new_state_name)
+# Careful, only the last one added in this frame will be change in xsm
+func new_pending_state(new_state_name, args_on_enter = null,
+		args_after_enter = null, args_before_exit = null,
+		args_on_exit = null) -> void:
+	var new_state_array = []
+	new_state_array.append(new_state_name)
+	new_state_array.append(args_on_enter)
+	new_state_array.append(args_after_enter)
+	new_state_array.append(args_before_exit)
+	new_state_array.append(args_on_exit)
+	pending_states.append(new_state_array)
 	emit_signal("pending_state_added", new_state_name)
 
 

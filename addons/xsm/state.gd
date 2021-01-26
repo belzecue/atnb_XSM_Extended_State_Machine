@@ -179,8 +179,10 @@ func _on_timeout(_name) -> void:
 #
 func change_state(new_state, args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
+
 	if not state_in_update:
-		state_root.new_pending_state(new_state)
+		state_root.new_pending_state(new_state, args_on_enter, args_after_enter,
+				args_before_exit, args_on_exit)
 
 	if done_for_this_frame:
 		return null

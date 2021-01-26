@@ -15,7 +15,7 @@ export (int) var ground_friction = 6
 export (int) var walk_margin = 80
 export (int) var run_margin = 150
 
-export (int) var jump_speed = 850
+export (int) var jump_speed = 650
 export (int) var air_speed = 610
 export (int) var air_friction = 8
 
