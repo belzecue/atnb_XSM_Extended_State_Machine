@@ -23,7 +23,7 @@ extends State
 # This node will probably expand a bit in the next versions of XSM
 
 
-signal some_state_changed(sender, new_state_node)
+signal some_state_changed(sender_node, new_state_node)
 signal pending_state_changed(added_state_node)
 signal pending_state_added(new_state_name)
 signal active_state_list_changed(active_states_list)
@@ -37,7 +37,7 @@ var active_states := {}
 #
 # INIT
 #
-func _ready():
+func _ready() -> void:
 	state_root = self
 	if fsm_owner == null and get_parent() != null:
 		target = get_parent()
@@ -66,7 +66,7 @@ func init_state_map() -> void:
 #
 # PROCESS
 #
-func _physics_process(delta) -> void:
+func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
 	if not disabled:
@@ -74,12 +74,13 @@ func _physics_process(delta) -> void:
 		if pending_states.size() > 0:
 			state_in_update = true
 			var new_state_with_args = pending_states.pop_front()
-			var new_state = new_state_with_args[0]
+			var new_state: String = new_state_with_args[0]
 			var arg1 = new_state_with_args[1]
 			var arg2 = new_state_with_args[2]
 			var arg3 = new_state_with_args[3]
 			var arg4 = new_state_with_args[4]
-			var new_state_node = change_state(new_state, arg1, arg2, arg3, arg4)
+			var new_state_node: State = change_state(new_state,
+					arg1, arg2, arg3, arg4)
 			emit_signal("pending_state_changed", new_state_node)
 			state_in_update = false
 			pending_states.clear()
@@ -90,10 +91,10 @@ func _physics_process(delta) -> void:
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
 # Careful, only the last one added in this frame will be change in xsm
-func new_pending_state(new_state_name, args_on_enter = null,
+func new_pending_state(new_state_name: String, args_on_enter = null,
 		args_after_enter = null, args_before_exit = null,
 		args_on_exit = null) -> void:
-	var new_state_array = []
+	var new_state_array := []
 	new_state_array.append(new_state_name)
 	new_state_array.append(args_on_enter)
 	new_state_array.append(args_after_enter)
@@ -116,10 +117,10 @@ func remove_active_state(state_to_erase) -> void:
 
 
 func add_active_state(state_to_add) -> void:
-	var state_name = state_to_add.name
-	var name_in_state_map = state_name
+	var state_name: String = state_to_add.name
+	var name_in_state_map: String = state_name
 	if not state_map.has(state_name):
-		var parent_name = state_to_add.get_parent().name
+		var parent_name: String = state_to_add.get_parent().name
 		name_in_state_map = str("%s/%s" % [parent_name, state_name])
 	active_states[state_to_add] = name_in_state_map
 	emit_signal("active_state_list_changed", active_states)
