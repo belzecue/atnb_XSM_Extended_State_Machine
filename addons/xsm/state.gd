@@ -82,8 +82,8 @@ export(NodePath) var animation_player = null
 var active := false
 var state_root: State = null
 var target: Node = null
-var anim_player:AnimationPlayer = null
-var last_state:State = null
+var anim_player: AnimationPlayer = null
+var last_state: State = null
 var done_for_this_frame := false
 var state_in_update := false
 
@@ -180,9 +180,11 @@ func _on_timeout(_name: String) -> void:
 func change_state(new_state: String, args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
 
-	if not state_in_update:
+	if not state_root.state_in_update:
+#		print("%s pending state : '%s' -> '%s'" % [target.name, get_name(), new_state])
 		state_root.new_pending_state(new_state, args_on_enter, args_after_enter,
 				args_before_exit, args_on_exit)
+		return null
 
 	if done_for_this_frame:
 		return null
@@ -200,6 +202,7 @@ func change_state(new_state: String, args_on_enter = null, args_after_enter = nu
 	if new_state_node.disabled:
 		return null
 
+#	print("%s changing state : '%s' -> '%s'" % [target.name, get_name(), new_state])
 	# compare the current path and the new one -> get the common_root
 	var common_root: State = get_common_root(new_state_node)
 
@@ -221,13 +224,21 @@ func change_state(new_state: String, args_on_enter = null, args_after_enter = nu
 	if not is_root() :
 		new_state_node.get_parent().emit_signal("substate_changed", new_state_node)
 	state_root.emit_signal("some_state_changed", self, new_state_node)
-#	print("State changed: '%s' -> '%s'" % [get_name(), new_state])
+
+#	print("%s changed state : '%s' -> '%s'" % [target.name, get_name(), new_state])
 	return new_state_node
 
 
 # New function name
 func goto_state(new_state: String) -> void:
 	change_state(new_state)
+
+
+func change_state_if(new_state: String, if_state: String) -> State:
+	var s = find_state_node(if_state)
+	if s == null or s.active:
+		return change_state(new_state)
+	return null
 
 
 func set_active(new_active: bool) -> void:
@@ -243,7 +254,7 @@ func is_active(state_name: String) -> bool:
 	var s: State = find_state_node(name)
 	if s == null:
 		return false
-	return s.find_state_node(name).active
+	return s.active
 
 
 # returns the first active substate or all children if has_regions

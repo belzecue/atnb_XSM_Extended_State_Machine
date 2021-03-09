@@ -288,8 +288,6 @@ animation_player = null
 
 [node name="InAir" type="Node" parent="Player/StateRoot/RegionMovement"]
 script = ExtResource( 8 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
@@ -314,21 +312,29 @@ animation_player = null
 
 [node name="RegionColor" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 7 )
+disabled = false
+has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="Purple" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 14 )
+disabled = false
+has_regions = false
 fsm_owner = NodePath("../../../Sprite")
 animation_player = null
 
 [node name="Green" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 13 )
+disabled = false
+has_regions = false
 fsm_owner = NodePath("../../../Sprite")
 animation_player = null
 
 [node name="Orange" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 16 )
+disabled = false
+has_regions = false
 fsm_owner = NodePath("../../../Sprite")
 animation_player = null
 

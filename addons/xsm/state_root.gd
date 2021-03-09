@@ -112,15 +112,24 @@ func is_root() -> bool:
 
 
 func remove_active_state(state_to_erase) -> void:
-	active_states.erase(state_to_erase)
+	var state_name = state_to_erase.name
+	var name_in_state_map = state_name
+	if not state_map.has(state_name):
+		var parent_name = state_to_erase.get_parent().name
+		name_in_state_map = str("%s/%s" % [parent_name, state_name])
+	active_states.erase(name_in_state_map)
 	emit_signal("active_state_list_changed", active_states)
 
 
 func add_active_state(state_to_add) -> void:
-	var state_name: String = state_to_add.name
-	var name_in_state_map: String = state_name
+	var state_name = state_to_add.name
+	var name_in_state_map = state_name
 	if not state_map.has(state_name):
-		var parent_name: String = state_to_add.get_parent().name
+		var parent_name = state_to_add.get_parent().name
 		name_in_state_map = str("%s/%s" % [parent_name, state_name])
-	active_states[state_to_add] = name_in_state_map
+	active_states[name_in_state_map] = state_to_add
 	emit_signal("active_state_list_changed", active_states)
+
+
+func in_active_states(state_name: String) -> bool:
+	return active_states.has(state_name)
