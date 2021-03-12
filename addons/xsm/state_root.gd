@@ -28,10 +28,14 @@ signal pending_state_changed(added_state_node)
 signal pending_state_added(new_state_name)
 signal active_state_list_changed(active_states_list)
 
+
+export(int) var history_size := 12
+
 var pending_states := []
 var state_map := {}
 var duplicate_names := {} # Stores number of times a state_name is duplicated
 var active_states := {}
+var active_states_history := []
 
 
 #
@@ -71,7 +75,8 @@ func _physics_process(delta: float) -> void:
 		return
 	if not disabled:
 		reset_done_this_frame(false)
-		if pending_states.size() > 0:
+		add_to_active_states_history(active_states.duplicate())
+		while pending_states.size() > 0:
 			state_in_update = true
 			var new_state_with_args = pending_states.pop_front()
 			var new_state: String = new_state_with_args[0]
@@ -83,7 +88,7 @@ func _physics_process(delta: float) -> void:
 					arg1, arg2, arg3, arg4)
 			emit_signal("pending_state_changed", new_state_node)
 			state_in_update = false
-			pending_states.clear()
+#			pending_states.clear()
 		update_active_states(delta)
 
 
@@ -105,31 +110,52 @@ func new_pending_state(new_state_name: String, args_on_enter = null,
 
 
 #
-# PRIVATE FUNCTIONS
+# PUBLIC FUNCTIONS
 #
+func in_active_states(state_name: String) -> bool:
+	return active_states.has(state_name)
+
+
+func get_previous_active_states(history_id: int = 0) -> Dictionary:
+	if active_states_history.size() <= history_id:
+		return Dictionary()
+	return active_states_history[history_id]
+
+
+# CAREFUL IF YOU HAVE TWO STATES WITH THE SAME NAME, THE "state_name"
+# SHOULD BE OF THE FORM "ParentName/ChildName"
+func was_state_active(state_name: String, history_id: int = 0) -> bool:
+	return get_previous_active_states(history_id).has(state_name)
+
+
 func is_root() -> bool:
 	return true
 
 
-func remove_active_state(state_to_erase) -> void:
-	var state_name = state_to_erase.name
-	var name_in_state_map = state_name
+#
+# PRIVATE FUNCTIONS
+#
+func add_to_active_states_history(new_active_states: Dictionary) -> void:
+	active_states_history.push_front(new_active_states)
+	while active_states_history.size() > history_size:
+		var _last: Dictionary = active_states_history.pop_back()
+
+
+func remove_active_state(state_to_erase: State) -> void:
+	var state_name: String = state_to_erase.name
+	var name_in_state_map: String = state_name
 	if not state_map.has(state_name):
-		var parent_name = state_to_erase.get_parent().name
+		var parent_name: String = state_to_erase.get_parent().name
 		name_in_state_map = str("%s/%s" % [parent_name, state_name])
 	active_states.erase(name_in_state_map)
 	emit_signal("active_state_list_changed", active_states)
 
 
-func add_active_state(state_to_add) -> void:
-	var state_name = state_to_add.name
-	var name_in_state_map = state_name
+func add_active_state(state_to_add: State) -> void:
+	var state_name: String = state_to_add.name
+	var name_in_state_map: String = state_name
 	if not state_map.has(state_name):
-		var parent_name = state_to_add.get_parent().name
+		var parent_name: String = state_to_add.get_parent().name
 		name_in_state_map = str("%s/%s" % [parent_name, state_name])
 	active_states[name_in_state_map] = state_to_add
 	emit_signal("active_state_list_changed", active_states)
-
-
-func in_active_states(state_name: String) -> bool:
-	return active_states.has(state_name)

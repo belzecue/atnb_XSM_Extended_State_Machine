@@ -15,4 +15,4 @@ func _on_update(_delta):
 
 
 func who_was_i():
-	print("Green")
+	print("I was Green")

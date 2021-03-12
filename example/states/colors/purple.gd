@@ -16,4 +16,4 @@ func _on_update(_delta):
 
 # Test of get_active_substate(), see in parent's script "RegionColor"
 func who_was_i():
-	print("Purple")
+	print("I was Purple")

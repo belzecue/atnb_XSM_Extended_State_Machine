@@ -6,6 +6,10 @@ extends State
 func _on_enter(_args):
 	if target.velocity.y >= 0: play("Fall")
 	else: play("FlyUp")
+	if state_root.was_state_active("Walk"):
+		print("Fall from Walk")
+	if state_root.was_state_active("Jump"):
+		print("Fall from Jump")
 
 
 func _on_update(_delta):
