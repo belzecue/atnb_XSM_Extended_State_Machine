@@ -287,13 +287,14 @@ func play_backwards(anim: String) -> void:
 
 
 func play_blend(anim: String, custom_blend: float, custom_speed: float = 1.0,
-		from_end: bool = false):
+		from_end: bool = false) -> void:
 	if active and anim_player != null and anim_player.has_animation(anim):
 		if anim_player.current_animation != anim:
 			anim_player.play(anim, custom_blend, custom_speed, from_end)
 
 
-func play_sync(anim: String, custom_speed: float = 1.0, from_end: bool = false):
+func play_sync(anim: String, custom_speed: float = 1.0,
+		from_end: bool = false) -> void:
 	if active and anim_player != null and anim_player.has_animation(anim):
 		var curr_anim: String = anim_player.current_animation
 		if curr_anim != anim and curr_anim != "":
@@ -306,7 +307,7 @@ func play_sync(anim: String, custom_speed: float = 1.0, from_end: bool = false):
 			play(anim, custom_speed, from_end)
 
 
-func pause():
+func pause() -> void:
 	stop(false)
 
 
