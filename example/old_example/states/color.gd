@@ -3,7 +3,8 @@ extends State
 
 
 # FUNCTIONS AVAILABLE TO INHERIT
-
+#func _on_enter(_args):
+#	pass
 
 func _on_update(_delta) -> void:
 	var prev_pressed = Input.is_action_just_pressed("prev_color")

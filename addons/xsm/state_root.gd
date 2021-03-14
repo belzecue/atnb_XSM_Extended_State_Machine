@@ -29,11 +29,12 @@ signal pending_state_added(new_state_name)
 signal active_state_list_changed(active_states_list)
 
 
-export(int) var history_size := 12
+export(int, 0, 1024) var history_size := 12
 
-var pending_states := []
 var state_map := {}
 var duplicate_names := {} # Stores number of times a state_name is duplicated
+var pending_states := []
+
 var active_states := {}
 var active_states_history := []
 

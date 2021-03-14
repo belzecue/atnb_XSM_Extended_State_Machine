@@ -75,7 +75,6 @@ signal enabled()
 
 export var disabled := false setget set_disabled
 export var has_regions := false
-#export var is_fallback = false
 export(NodePath) var fsm_owner = null
 export(NodePath) var animation_player = null
 
@@ -276,23 +275,56 @@ func get_active_states() -> Dictionary:
 	return state_root.active_states
 
 
-func play(anim: String) -> void:
+func play(anim: String, custom_speed: float = 1.0, from_end: bool = false) -> void:
 	if active and anim_player != null and anim_player.has_animation(anim):
 		if anim_player.current_animation != anim:
 			anim_player.stop()
 			anim_player.play(anim)
 
 
-func stop() -> void:
-	if anim_player != null:
-		anim_player.stop()
+func play_backwards(anim: String) -> void:
+	play(anim, -1.0, true)
+
+
+func play_blend(anim: String, custom_blend: float, custom_speed: float = 1.0,
+		from_end: bool = false):
+	if active and anim_player != null and anim_player.has_animation(anim):
+		if anim_player.current_animation != anim:
+			anim_player.play(anim, custom_blend, custom_speed, from_end)
+
+
+func play_sync(anim: String, custom_speed: float = 1.0, from_end: bool = false):
+	if active and anim_player != null and anim_player.has_animation(anim):
+		var curr_anim: String = anim_player.current_animation
+		if curr_anim != anim and curr_anim != "":
+			var curr_anim_pos: float = anim_player.current_animation_position
+			var curr_anim_length: float = anim_player.current_animation_length
+			var ratio: float = curr_anim_pos / curr_anim_length
+			play(anim, custom_speed, from_end)
+			anim_player.seek(ratio * anim_player.current_animation_length)
+		else:
+			play(anim, custom_speed, from_end)
+
+
+func pause():
+	stop(false)
+
+
+func queue(anim: String) -> void:
+	if active and anim_player != null and anim_player.has_animation(anim):
+		anim_player.queue(anim)
+
+
+func stop(reset: bool = true) -> void:
+	if active and anim_player != null:
+		anim_player.stop(reset)
+		state_root.current_anim_priority = 0
 
 
 func is_playing(anim: String) -> bool:
 	if anim_player != null:
 		return anim_player.current_animation == anim
-	else:
-		return false
+	return false
 
 
 func add_timer(name: String, time: float) -> Timer:

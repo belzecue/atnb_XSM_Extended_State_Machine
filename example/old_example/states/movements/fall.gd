@@ -16,7 +16,7 @@ func _on_update(_delta):
 	if target.is_on_floor() && get_node_or_null("PreJump") != null:
 		var _s = change_state("Jump")
 		return
-	elif target.is_on_floor():
+	if target.is_on_floor():
 		var _s = change_state("Land")
 		return
 

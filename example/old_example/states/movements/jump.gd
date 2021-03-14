@@ -18,8 +18,6 @@ func _on_update(_delta):
 
 	if jumping:
 		target.velocity.y = -target.jump_speed
-		if last_state.get_name() == "Fall":
-			jumping = false
 
 
 func _on_exit(_args):
