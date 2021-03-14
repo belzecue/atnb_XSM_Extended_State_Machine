@@ -97,6 +97,21 @@ In any State node, you can call the following public functions:
 * `play("Anim")`
    plays the animation "Anim" of the State's AnimationPlayer
 
+* `play_backwards("Anim")`
+   plays the animation "Anim" of the State's AnimationPlayer, starting from the end
+
+* `play_blend("Anim", custom_blend = 0.0, custom_speed = 1.0, from_end = false)`
+   blends the animation "Anim" with the current one of the State's AnimationPlayer (plays both animation during the custom_blend time)
+
+* `play_sync("Anim", custom_speed = 1.0, from_end = false)`
+   synchronizes the animation "Anim" with the current animation of the State's AnimationPlayer
+
+* `pause()`
+   pauses the current animation
+
+* `queue("Anim)`
+   queues the animation "Anim" at the end of the State's AnimationPlayer list. If the current animation is looping, the queue will NOT play.
+
 * `stop()`
    stops the current animation
 
