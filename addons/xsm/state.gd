@@ -63,9 +63,9 @@ extends Node
 #   returns the active substate (all the children if has_regions)
 
 
-signal state_entered(sender, new_state)
-signal state_exited(sender, new_state)
-signal state_updated(sender, new_state)
+signal state_entered(sender)
+signal state_exited(sender)
+signal state_updated(sender)
 signal state_changed(sender, new_state)
 signal substate_entered(sender)
 signal substate_exited(sender)
@@ -219,7 +219,7 @@ func change_state(new_state: String, args_on_enter = null, args_after_enter = nu
 	common_root.reset_done_this_frame(true)
 
 	# signal the change
-	emit_signal("state_changed", self)
+	emit_signal("state_changed", self, new_state)
 	if not is_root() :
 		new_state_node.get_parent().emit_signal("substate_changed", new_state_node)
 	state_root.emit_signal("some_state_changed", self, new_state_node)

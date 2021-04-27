@@ -290,50 +290,36 @@ animation_player = NodePath("../AnimationPlayer")
 
 [node name="RegionMovement" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 17 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="OnGround" type="Node" parent="Player/StateRoot/RegionMovement"]
 script = ExtResource( 9 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="Idle" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 4 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="Land" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 2 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="Walk" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 1 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="Crouch" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 13 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="InAir" type="Node" parent="Player/StateRoot/RegionMovement"]
 script = ExtResource( 5 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
@@ -344,22 +330,16 @@ animation_player = null
 
 [node name="Fall" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
 script = ExtResource( 19 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="Jump" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
 script = ExtResource( 14 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
 [node name="RegionColor" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 3 )
-disabled = false
-has_regions = false
 fsm_owner = null
 animation_player = null
 
@@ -370,15 +350,11 @@ animation_player = null
 
 [node name="Green" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 15 )
-disabled = false
-has_regions = false
 fsm_owner = NodePath("../../../Sprite")
 animation_player = null
 
 [node name="Orange" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 18 )
-disabled = false
-has_regions = false
 fsm_owner = NodePath("../../../Sprite")
 animation_player = null
 
