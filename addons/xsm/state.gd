@@ -250,7 +250,7 @@ func set_active(new_active: bool) -> void:
 
 
 func is_active(state_name: String) -> bool:
-	var s: State = find_state_node(name)
+	var s: State = find_state_node(state_name)
 	if s == null:
 		return false
 	return s.active
