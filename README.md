@@ -6,7 +6,7 @@ Latest version : 1.5
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
 
-For the very first state machine with XSM, try our HelloWorld example down this page. You can also look at the very simple example provided with this plugin to have a glimpse of what is possible with it.
+For the very first state machine with XSM, try our [HelloWorld example](https://gitlab.com/atnb/xsm#hello-world) down this page. You can also look at the very simple example provided with this plugin to have a glimpse of what is possible with it.
 
 
 Understanding XSM
