@@ -399,10 +399,10 @@ func init_children_states(root_state: State, first_branch: bool) -> void:
 				c.anim_player = root_state.anim_player
 			if first_branch and ( has_regions or c == get_child(0) ):
 				c.status = ACTIVE
-#				c.enter()
+				c.enter()
 				c.last_state = root_state
 				c.init_children_states(root_state, true)
-#				c._after_enter(null)
+				c._after_enter(null)
 			else:
 				c.init_children_states(root_state, false)
 

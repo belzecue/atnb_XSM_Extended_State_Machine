@@ -47,9 +47,9 @@ func _ready() -> void:
 	if fsm_owner == null and get_parent() != null:
 		target = get_parent()
 	init_state_map()
+	enter()
 	init_children_states(self, true)
-	status = ACTIVE
-#	set_active(true)
+	_after_enter(null)
 
 
 func _get_configuration_warning() -> String:
