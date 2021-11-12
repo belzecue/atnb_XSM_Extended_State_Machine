@@ -6,6 +6,9 @@ Latest version : 1.5.1
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
 
+For the very first state machine with XSM, try our [HelloWorld example](https://gitlab.com/atnb/xsm#hello-world) down this page. You can also look at the very simple example provided with this plugin to have a glimpse of what is possible with it.
+
+
 Understanding XSM
 -----------------
 
@@ -152,6 +155,36 @@ The StateRoot has additional signals :
 * `signal pending_state_changed(added_state_node)`
 * `signal pending_state_added(new_state_name)`
 * `signal active_state_list_changed(active_states_list)`
+
+
+Hello World
+-----------------
+
+Your first try with XSM could be to :
+* Install the module (using godot's AssetLib on the top of your editor)
+* Activate the module (project / parameters / Extensions and check activate for XSM)
+* Select the node that needs a StateMachine (for example a character)
+* Add a new child node (or Ctrl-A) of type StateRoot
+   You should see a yellow warning on your StateRoot node, select the node and in the inspector, assign your character node as your StateRoot's target
+* You can now add two State nodes to your StateRoot (same as above : Ctrl-A)
+* Add a script to the first State and chose the Empty State template.
+* Add a script to the second State and chose the Empty State template.
+* in the first script, in the _on_enter(_args) function, add a line with:
+   `print("Hello world of state 1")`
+* then in the _on_update(_delta) function, add:
+ ```python
+   if Input.is_action_just_pressed("ui_accept"):
+      change_state("State2")
+```
+* in the second script, in the _on_enter(_args) function, add a line with:
+   `print("Hello world of state 2")`
+* then in the _on_update(_delta) function, add:
+ ```python
+   if Input.is_action_just_pressed("ui_accept"):
+      change_state("State")
+```
+And here you are, you made your first state machine with XSM!
+
 
 Special Thanks
 -----------------
