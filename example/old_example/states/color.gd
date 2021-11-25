@@ -11,7 +11,6 @@ func _on_update(_delta) -> void:
 	var next_pressed = Input.is_action_just_pressed("next_color")
 	if prev_pressed or next_pressed:
 		get_active_substate().who_was_i()
-		print(state_root.get_previous_active_states())
 
 
 func _after_update(_delta) -> void:
