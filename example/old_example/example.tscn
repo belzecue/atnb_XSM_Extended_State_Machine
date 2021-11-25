@@ -14,10 +14,10 @@
 [ext_resource path="res://example/old_example/assets/font_TIMESS__.ttf" type="DynamicFontData" id=12]
 [ext_resource path="res://example/old_example/states/movements/crouch.gd" type="Script" id=13]
 [ext_resource path="res://example/old_example/states/movements/jump.gd" type="Script" id=14]
-[ext_resource path="res://example/old_example/states/colors/green.gd" type="Script" id=15]
-[ext_resource path="res://example/old_example/states/colors/purple.gd" type="Script" id=16]
+[ext_resource path="res://example/old_example/states/colors/Green.gd" type="Script" id=15]
+[ext_resource path="res://example/old_example/states/colors/Purple.gd" type="Script" id=16]
 [ext_resource path="res://example/old_example/states/movement.gd" type="Script" id=17]
-[ext_resource path="res://example/old_example/states/colors/orange.gd" type="Script" id=18]
+[ext_resource path="res://example/old_example/states/colors/Orange.gd" type="Script" id=18]
 [ext_resource path="res://example/old_example/states/movements/fall.gd" type="Script" id=19]
 
 [sub_resource type="CircleShape2D" id=1]

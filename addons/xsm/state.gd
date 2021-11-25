@@ -399,6 +399,7 @@ func init_children_states(root_state: State, first_branch: bool) -> void:
 				c.anim_player = root_state.anim_player
 			if first_branch and ( has_regions or c == get_child(0) ):
 				c.status = ACTIVE
+				state_root.add_active_state(self)
 				c.enter()
 				c.last_state = root_state
 				c.init_children_states(root_state, true)
@@ -467,6 +468,7 @@ func exit(args = null) -> void:
 	del_timers()
 	_on_exit(args)
 	status = INACTIVE
+	state_root.remove_active_state(self)
 	emit_signal("state_exited", self)
 	if not is_root():
 		get_parent().emit_signal("substate_exited", self)
@@ -508,6 +510,7 @@ func enter(args = null) -> void:
 		return
 #	set_active(true)
 	status = ACTIVE
+	state_root.add_active_state(self)
 	_on_enter(args)
 	emit_signal("state_entered", self)
 	if not is_root():
