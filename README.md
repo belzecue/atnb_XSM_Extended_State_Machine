@@ -1,7 +1,7 @@
 XSM Extended State Machine
 ==========================
 
-Latest version : 1.5.4
+Latest version : 1.5.5
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
@@ -34,7 +34,7 @@ By default, your XSM is enabled, you can disable it (or any branch of you XSM's 
 
 You can us the same names for states in different branches of your StateMachine but THEIR PARENT NAMES MUST BE DIFFERENT. In the state_map and active_states_list, they will be referenced as "ParentName/ChildName" to differentiate theme.
 
-The state_root owns a history of the active_states_list, the size of which can be changed in the StateRoot's inspector. You can call `was_active("StateName")` to know if the StateName was active last frame. Careful: if two states have the same name, they are referenced as "ParentName/StateName" in the state's history.
+The state_root owns a history of the active_states_list, the size of which can be changed in the StateRoot's inspector. You can call `state_root.was_state_active("StateName")` to know if the StateName was active last frame. Careful: if two states have the same name, they are referenced as "ParentName/StateName" in the state's history.
 
 Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM will get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
 
@@ -139,13 +139,13 @@ In any State node, you can call the following public functions:
 
 The States are calling different signals during their life :
 
-* `signal state_entered(sender, new_state)`
-* `signal state_exited(sender, new_state)`
-* `signal state_updated(sender, new_state)`
+* `signal state_entered(sender)`
+* `signal state_exited(sender)`
+* `signal state_updated(sender)`
 * `signal state_changed(sender, new_state)`
 * `signal substate_entered(sender)`
 * `signal substate_exited(sender)`
-* `signal substate_changed(sender)`
+* `signal substate_changed(sender, new_state)`
 * `signal disabled()`
 * `signal enabled()`
 

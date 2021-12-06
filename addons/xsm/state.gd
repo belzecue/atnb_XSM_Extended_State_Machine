@@ -69,7 +69,7 @@ signal state_updated(sender)
 signal state_changed(sender, new_state)
 signal substate_entered(sender)
 signal substate_exited(sender)
-signal substate_changed(sender)
+signal substate_changed(sender, new_state)
 signal disabled()
 signal enabled()
 
@@ -200,7 +200,7 @@ func change_state(new_state: String, args_on_enter = null, args_after_enter = nu
 	# signal the change
 	emit_signal("state_changed", self, new_state)
 	if not is_root() :
-		new_state_node.get_parent().emit_signal("substate_changed", new_state_node)
+		new_state_node.get_parent().emit_signal("substate_changed", self, new_state_node)
 	state_root.emit_signal("some_state_changed", self, new_state_node)
 
 	if debug_mode:
@@ -220,13 +220,13 @@ func change_state_if(new_state: String, if_state: String) -> State:
 	return null
 
 
-func has_parent(state_node: State) -> bool:
-	var parent = get_parent()
-	if parent == state_node:
-		return true
-	if parent.get_class() != "State" or parent == state_root:
-		return false
-	return parent.has_parent(state_node)
+# func has_parent(state_node: State) -> bool:
+# 	var parent = get_parent()
+# 	if parent == state_node:
+# 		return true
+# 	if parent.get_class() != "State" or parent == state_root:
+# 		return false
+# 	return parent.has_parent(state_node)
 
 
 func is_active(state_name: String) -> bool:
@@ -236,6 +236,12 @@ func is_active(state_name: String) -> bool:
 	return s.status == ACTIVE
 
 
+# CAREFUL IF YOU HAVE TWO STATES WITH THE SAME NAME, THE "state_name"
+# SHOULD BE OF THE FORM "ParentName/ChildName"
+func was_active(state_name: String, history_id: int = 0) -> bool:
+	return state_root.was_state_active(state_name, history_id)
+
+	
 # returns the first active substate or all children if has_regions
 func get_active_substate():
 	if has_regions and status == ACTIVE:
