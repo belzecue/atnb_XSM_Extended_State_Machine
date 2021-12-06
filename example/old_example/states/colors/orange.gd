@@ -4,8 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func _on_enter(_args):
-	play("PurpleToOrange")
-#	target.modulate = Color("#ee8e28")
+	target.modulate = Color.orange
 
 
 func _on_update(_delta):

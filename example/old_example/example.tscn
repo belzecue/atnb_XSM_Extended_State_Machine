@@ -1,11 +1,10 @@
-[gd_scene load_steps=37 format=2]
+[gd_scene load_steps=36 format=2]
 
 [ext_resource path="res://example/old_example/states/movements/walk.gd" type="Script" id=1]
 [ext_resource path="res://example/old_example/states/movements/land.gd" type="Script" id=2]
 [ext_resource path="res://example/old_example/states/color.gd" type="Script" id=3]
 [ext_resource path="res://example/old_example/states/movements/idle.gd" type="Script" id=4]
 [ext_resource path="res://example/old_example/states/movements/in_air.gd" type="Script" id=5]
-[ext_resource path="res://addons/xsm/state.gd" type="Script" id=6]
 [ext_resource path="res://addons/xsm/state_root.gd" type="Script" id=7]
 [ext_resource path="res://example/old_example/player.gd" type="Script" id=8]
 [ext_resource path="res://example/old_example/states/movements/on_ground.gd" type="Script" id=9]
@@ -282,6 +281,30 @@ current = true
 position = Vector2( 512, 420 )
 script = ExtResource( 8 )
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+visible = false
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="Player"]
+texture = ExtResource( 10 )
+hframes = 7
+frame = 6
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+anims/Brake = SubResource( 2 )
+anims/Crouch = SubResource( 3 )
+anims/Fall = SubResource( 4 )
+anims/FlyUp = SubResource( 5 )
+anims/GreenToPurple = SubResource( 6 )
+anims/Idle = SubResource( 7 )
+anims/Jump = SubResource( 8 )
+anims/Land = SubResource( 9 )
+anims/OrangeToGreen = SubResource( 10 )
+anims/PurpleToOrange = SubResource( 11 )
+anims/Run = SubResource( 12 )
+anims/TopCurve = SubResource( 13 )
+anims/Walk = SubResource( 14 )
+
 [node name="StateRoot" type="Node" parent="Player"]
 script = ExtResource( 7 )
 has_regions = true
@@ -290,6 +313,21 @@ animation_player = NodePath("../AnimationPlayer")
 
 [node name="RegionMovement" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 17 )
+fsm_owner = null
+animation_player = null
+
+[node name="InAir" type="Node" parent="Player/StateRoot/RegionMovement"]
+script = ExtResource( 5 )
+fsm_owner = null
+animation_player = null
+
+[node name="Fall" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
+script = ExtResource( 19 )
+fsm_owner = null
+animation_player = null
+
+[node name="Jump" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
+script = ExtResource( 14 )
 fsm_owner = null
 animation_player = null
 
@@ -318,26 +356,6 @@ script = ExtResource( 13 )
 fsm_owner = null
 animation_player = null
 
-[node name="InAir" type="Node" parent="Player/StateRoot/RegionMovement"]
-script = ExtResource( 5 )
-fsm_owner = null
-animation_player = null
-
-[node name="Idle" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
-script = ExtResource( 6 )
-fsm_owner = null
-animation_player = null
-
-[node name="Fall" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
-script = ExtResource( 19 )
-fsm_owner = null
-animation_player = null
-
-[node name="Jump" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
-script = ExtResource( 14 )
-fsm_owner = null
-animation_player = null
-
 [node name="RegionColor" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 3 )
 fsm_owner = null
@@ -357,31 +375,6 @@ animation_player = null
 script = ExtResource( 18 )
 fsm_owner = NodePath("../../../Sprite")
 animation_player = null
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-visible = false
-shape = SubResource( 1 )
-
-[node name="Sprite" type="Sprite" parent="Player"]
-modulate = Color( 0.933333, 0.556863, 0.156863, 1 )
-texture = ExtResource( 10 )
-hframes = 7
-frame = 6
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
-anims/Brake = SubResource( 2 )
-anims/Crouch = SubResource( 3 )
-anims/Fall = SubResource( 4 )
-anims/FlyUp = SubResource( 5 )
-anims/GreenToPurple = SubResource( 6 )
-anims/Idle = SubResource( 7 )
-anims/Jump = SubResource( 8 )
-anims/Land = SubResource( 9 )
-anims/OrangeToGreen = SubResource( 10 )
-anims/PurpleToOrange = SubResource( 11 )
-anims/Run = SubResource( 12 )
-anims/TopCurve = SubResource( 13 )
-anims/Walk = SubResource( 14 )
 
 [node name="Platforms" type="Node2D" parent="."]
 position = Vector2( 512, 300 )

@@ -47,7 +47,8 @@ func _ready() -> void:
 	if fsm_owner == null and get_parent() != null:
 		target = get_parent()
 	init_state_map()
-	enter()
+	status = ACTIVE
+	_on_enter(null)
 	init_children_states(self, true)
 	_after_enter(null)
 
@@ -119,6 +120,8 @@ func in_active_states(state_name: String) -> bool:
 
 # index 0 is the most recent history
 func get_previous_active_states(history_id: int = 0) -> Dictionary:
+	if active_states_history.empty():
+		return Dictionary()
 	if active_states_history.size() <= history_id:
 		return active_states_history[0]
 	return active_states_history[history_id]
@@ -127,6 +130,9 @@ func get_previous_active_states(history_id: int = 0) -> Dictionary:
 # CAREFUL IF YOU HAVE TWO STATES WITH THE SAME NAME, THE "state_name"
 # SHOULD BE OF THE FORM "ParentName/ChildName"
 func was_state_active(state_name: String, history_id: int = 0) -> bool:
+	var prev = get_previous_active_states(history_id)
+	if not prev:
+		return false
 	return get_previous_active_states(history_id).has(state_name)
 
 

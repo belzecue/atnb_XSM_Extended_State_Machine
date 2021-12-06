@@ -3,6 +3,7 @@ extends State
 
 
 # FUNCTIONS TO INHERIT #
+
 func _on_update(delta):
 	target.dir = 0
 
