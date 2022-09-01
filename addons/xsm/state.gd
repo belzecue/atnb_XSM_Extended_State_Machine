@@ -213,8 +213,6 @@ func change_state(new_state: String, args_on_enter = null, args_after_enter = nu
 		var debug_lvl = ""
 		for i in state_root.changing_state_level:
 			debug_lvl += " ⎸"
-		if debug_lvl == "":
-			print("")
 		print(debug_lvl, " /‾ %s changing state : '%s' -> '%s'" % [target.name, get_name(), new_state])
 		state_root.changing_state_level += 1
 	# compare the current path and the new one -> get the common_root
