@@ -1,34 +1,3 @@
-
-Accueil
-Aide
-Connexion
-atn
-/
-SoulMateBallad
-Suivre
-1
-Ajouter aux favoris
-1
-Bifurcation
-0
-Code
-Tickets 8
-Demandes d'ajout
-Projects
-Versions
-Wiki
-Activité
-128 Révisions
-4 Branches
-0 Tag
-82 MiB
-SoulMateBallad/addons/xsm/state.gd
-589 lignes
-17 KiB
-Brut
-Lien permanent
-Annotations
-Historique
 # MIT LICENSE Copyright 2020-2021 Etienne Blanc - ATN
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
