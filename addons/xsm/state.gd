@@ -230,7 +230,6 @@ func change_state(new_state: String, args_on_enter = null, args_after_enter = nu
 	# enters the nodes of the new branch from the parent to the next_state
 	# enters the first leaf of each following branch
 	# If ENTERED, change the status to ACTIVE
-#	common_root.enter_children(new_state_node.get_path(), args_on_enter, args_after_enter)
 	common_root.enter_children(args_on_enter, args_after_enter)
 
 	# sets this State as last_state for the new one
