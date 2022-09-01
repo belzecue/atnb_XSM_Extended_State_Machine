@@ -83,10 +83,10 @@ export(NodePath) var animation_player = null
 enum {INACTIVE, ENTERING, ACTIVE, EXITING}
 var status := INACTIVE
 var state_root: State = null
-var target: Player = null
+var target: Node = null
 # You can change the above line by the following one to be able to use
 # autocompletion on target in any State (could be any type instead of
-# KinematicBody2D, of course)!
+# KinematicBody2D, of course, such as Player ;) )!
 #var target: KinematicBody2D = null
 var anim_player: AnimationPlayer = null
 var last_state: State = null

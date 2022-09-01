@@ -308,6 +308,7 @@ anims/Walk = SubResource( 14 )
 [node name="StateRoot" type="Node" parent="Player"]
 script = ExtResource( 7 )
 has_regions = true
+debug_mode = true
 fsm_owner = NodePath("..")
 animation_player = NodePath("../AnimationPlayer")
 

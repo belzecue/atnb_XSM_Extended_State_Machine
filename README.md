@@ -38,7 +38,7 @@ The state_root owns a history of the active_states_list, the size of which can b
 
 Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM will get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
 
-Each state has a debug bool. If enabled in the inspector, this state will print debug info when changing state (careful not for its children, only for it; if needed, you have to enable debug for the children as well).
+If needed, you can print some debug infos. You can enable debug either in the StateRoot of in individual State. This will print texts from the state that calls change_state(). If you call change_state inside _on_enter(), it will add nested debug texts. Then it also will notify when the change has been done (and reduce the indentation)
 
 An empty State template is provided in [res://script_template/empty_state.gd](https://gitlab.com/atnb/xsm/-/blob/master/script_templates/empty_state.gd). You just need to add a script to your State and specify this one as a model.
 
