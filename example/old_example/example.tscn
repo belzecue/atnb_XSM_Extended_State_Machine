@@ -313,68 +313,45 @@ animation_player = NodePath("../AnimationPlayer")
 
 [node name="RegionMovement" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 17 )
-fsm_owner = null
-animation_player = null
 
 [node name="InAir" type="Node" parent="Player/StateRoot/RegionMovement"]
 script = ExtResource( 5 )
-fsm_owner = null
-animation_player = null
 
 [node name="Fall" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
 script = ExtResource( 19 )
-fsm_owner = null
-animation_player = null
 
 [node name="Jump" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
 script = ExtResource( 14 )
-fsm_owner = null
-animation_player = null
 
 [node name="OnGround" type="Node" parent="Player/StateRoot/RegionMovement"]
 script = ExtResource( 9 )
-fsm_owner = null
-animation_player = null
 
 [node name="Idle" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 4 )
-fsm_owner = null
-animation_player = null
 
 [node name="Land" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 2 )
-fsm_owner = null
-animation_player = null
 
 [node name="Walk" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 1 )
-fsm_owner = null
-animation_player = null
 
 [node name="Crouch" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 13 )
-fsm_owner = null
-animation_player = null
 
 [node name="RegionColor" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 3 )
-fsm_owner = null
-animation_player = null
 
 [node name="Purple" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 16 )
 fsm_owner = NodePath("../../../Sprite")
-animation_player = null
 
 [node name="Green" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 15 )
 fsm_owner = NodePath("../../../Sprite")
-animation_player = null
 
 [node name="Orange" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 18 )
 fsm_owner = NodePath("../../../Sprite")
-animation_player = null
 
 [node name="Platforms" type="Node2D" parent="."]
 position = Vector2( 512, 300 )

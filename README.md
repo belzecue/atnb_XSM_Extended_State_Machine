@@ -1,7 +1,7 @@
 XSM Extended State Machine
 ==========================
 
-Latest version : 1.5.5
+Latest version : 1.5.6
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
@@ -32,11 +32,13 @@ The RootState is a special State that owns a state_map dictionary (contains the 
 
 By default, your XSM is enabled, you can disable it (or any branch of you XSM's tree) in the inspector.
 
-You can us the same names for states in different branches of your StateMachine but THEIR PARENT NAMES MUST BE DIFFERENT. In the state_map and active_states_list, they will be referenced as "ParentName/ChildName" to differentiate theme.
+You can use the same names for states in different branches of your StateMachine but THEIR PARENT NAMES MUST BE DIFFERENT. In the state_map and active_states_list, they will be referenced as "ParentName/ChildName" to differentiate theme.
 
 The state_root owns a history of the active_states_list, the size of which can be changed in the StateRoot's inspector. You can call `state_root.was_state_active("StateName")` to know if the StateName was active last frame. Careful: if two states have the same name, they are referenced as "ParentName/StateName" in the state's history.
 
 Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM will get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
+
+Each state has a debug bool. If enabled in the inspector, this state will print debug info when changing state (careful not for its children, only for it; if needed, you have to enable debug for the children as well).
 
 An empty State template is provided in [res://script_template/empty_state.gd](https://gitlab.com/atnb/xsm/-/blob/master/script_templates/empty_state.gd). You just need to add a script to your State and specify this one as a model.
 

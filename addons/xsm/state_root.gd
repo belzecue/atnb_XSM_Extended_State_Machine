@@ -38,17 +38,22 @@ var pending_states := []
 var active_states := {}
 var active_states_history := []
 
+var changing_state_level := 0
+
 
 #
 # INIT
 #
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	state_root = self
 	if fsm_owner == null and get_parent() != null:
 		target = get_parent()
 	init_state_map()
 	status = ACTIVE
-	_on_enter(null)
+	# _on_enter(null)
+	enter()
 	init_children_states(self, true)
 	_after_enter(null)
 
@@ -130,9 +135,6 @@ func get_previous_active_states(history_id: int = 0) -> Dictionary:
 # CAREFUL IF YOU HAVE TWO STATES WITH THE SAME NAME, THE "state_name"
 # SHOULD BE OF THE FORM "ParentName/ChildName"
 func was_state_active(state_name: String, history_id: int = 0) -> bool:
-	var prev = get_previous_active_states(history_id)
-	if not prev:
-		return false
 	return get_previous_active_states(history_id).has(state_name)
 
 
