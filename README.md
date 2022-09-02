@@ -1,7 +1,7 @@
 XSM Extended State Machine
 ==========================
 
-Latest version : 1.5.6
+Latest version : 1.5.7
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
@@ -37,6 +37,8 @@ You can use the same names for states in different branches of your StateMachine
 The state_root owns a history of the active_states_list, the size of which can be changed in the StateRoot's inspector. You can call `state_root.was_state_active("StateName")` to know if the StateName was active last frame. Careful: if two states have the same name, they are referenced as "ParentName/StateName" in the state's history.
 
 Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM will get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
+
+You can specify in the inspector a default animation that will be played on State's enter (before the call of _on_enter() actually).
 
 If needed, you can print some debug infos. You can enable debug either in the StateRoot of in individual State. This will print texts from the state that calls change_state(). If you call change_state inside _on_enter(), it will add nested debug texts. Then it also will notify when the change has been done (and reduce the indentation)
 
@@ -191,7 +193,13 @@ And here you are, you made your first state machine with XSM!
 Special Thanks
 -----------------
 
-To TealOrbiter for such kind and useful suggestions that make xsm getting better each version.
+To TealOrbiter and Frontrider1 for such kind and useful suggestions that make xsm getting better each version.
+
+To flaticon.com and whoever made the icons used :
+  https://www.flaticon.com/free-icon-font/chart-network_5528059
+  https://www.flaticon.com/free-icon-font/chart-tree_5528048
+
+To piratesephiroth and MadFlyFish for a C# port : https://github.com/MadFlyFish/XSM-Csharp
 
 
 What's next ?

@@ -329,6 +329,7 @@ script = ExtResource( 9 )
 
 [node name="Idle" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 4 )
+anim_on_enter = "Idle"
 
 [node name="Land" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 2 )

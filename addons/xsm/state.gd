@@ -78,6 +78,7 @@ export var has_regions := false
 export var debug_mode := false
 export(NodePath) var fsm_owner = null
 export(NodePath) var animation_player = null
+export var anim_on_enter := ""
 
 #var active := false
 enum {INACTIVE, ENTERING, ACTIVE, EXITING}
@@ -86,7 +87,7 @@ var state_root: State = null
 var target: Node = null
 # You can change the above line by the following one to be able to use
 # autocompletion on target in any State (could be any type instead of
-# KinematicBody2D, of course, such as Player ;) )!
+# KinematicBody2D of course, such as your Player ;) )!
 #var target: KinematicBody2D = null
 var anim_player: AnimationPlayer = null
 var last_state: State = null
@@ -513,6 +514,8 @@ func enter(args = null) -> void:
 	if disabled:
 		return
 	status = ACTIVE
+	if anim_on_enter != "":
+		play(anim_on_enter)
 	_on_enter(args)
 	emit_signal("state_entered", self)
 	if not is_root():

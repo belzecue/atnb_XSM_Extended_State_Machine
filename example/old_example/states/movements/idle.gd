@@ -3,8 +3,10 @@ extends State
 
 
 # FUNCTIONS TO INHERIT #
-func _on_enter(_args):
-	play("Idle")
+
+# COMMENTED BECAUSE A DEFAULT ANIMATION IS SET IN THE INSPECTOR
+# func _on_enter(_args):
+# 	play("Idle")
 
 
 func _on_update(_delta):

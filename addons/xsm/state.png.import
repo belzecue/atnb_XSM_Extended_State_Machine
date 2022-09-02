@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/icon_statecharts.png-9e4cb85972dd1bd6a2301a1657dfdf86.stex"
+path="res://.import/state.png-e551c495150a099cb11df92c3b0adae8.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/xsm/icon_statecharts.png"
-dest_files=[ "res://.import/icon_statecharts.png-9e4cb85972dd1bd6a2301a1657dfdf86.stex" ]
+source_file="res://addons/xsm/state.png"
+dest_files=[ "res://.import/state.png-e551c495150a099cb11df92c3b0adae8.stex" ]
 
 [params]
 
@@ -28,7 +28,8 @@ process/fix_alpha_border=true
 process/premult_alpha=false
 process/HDR_as_SRGB=false
 process/invert_color=false
+process/normal_map_invert_y=false
 stream=false
 size_limit=0
-detect_3d=false
+detect_3d=true
 svg/scale=1.0
