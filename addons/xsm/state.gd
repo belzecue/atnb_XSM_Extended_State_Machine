@@ -37,6 +37,7 @@ extends Node
 # if you want to act (ie change State) after or during an animation
 #
 # In those scripts, you can call the public functions:
+#
 #  change_state("MyState")
 #   "MyState" is the name of an existing Node State
 #  change_state_node(my_state) or change_state_to()
@@ -45,6 +46,7 @@ extends Node
 #   Helper function to change to the next non disabled sibling state in tree
 #  prev_state()
 #   Helper function to change to the previous non disabled sibling state in tree
+#
 #  is_active("MyState") -> bool
 #   returns true if a state "MyState" is active in this xsm
 #  get_active_states() -> Dictionary:
@@ -52,12 +54,16 @@ extends Node
 #  get_state("MyState) -> State
 #   returns the State Node "MyState". You have to specify "Parent/MyState" if
 #   "MyState" is not a unique name
+#  get_active_substate()
+#   returns the active substate (all the children if has_regions)
+#
 #  play("Anim")
 #   plays the animation "Anim" of the State's AnimationPlayer
 #  stop()
 #   stops the current animation
 #  is_playing("Anim)
 #   returns true if "Anim" is playing
+#
 #  add_timer("Name", time)
 #   adds a timer named "Name" and returns this timer
 #   when the time is out, the function _on_timeout(_name) is called
@@ -65,8 +71,6 @@ extends Node
 #   deletes the timer "Name"
 #  is_timer("Name")
 #   returns true if there is a Timer "Name" running in this State
-#  get_active_substate()
-#   returns the active substate (all the children if has_regions)
 
 
 signal state_entered(sender)
