@@ -9,9 +9,11 @@ func _on_enter(_args):
 
 func _on_update(_delta):
 	if Input.is_action_just_pressed("prev_color"):
-		var _s = change_state("Purple")
+		var _s = prev_state()
+		# var _s = change_state("Purple")
 	elif Input.is_action_just_pressed("next_color"):
-		var _s = change_state("Orange")
+		var _s = next_state()
+		# var _s = change_state("Orange")
 
 
 func who_was_i():

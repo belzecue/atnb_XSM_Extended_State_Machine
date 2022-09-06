@@ -1,7 +1,8 @@
 XSM Extended State Machine
 ==========================
 
-Latest version : 1.5.7
+Latest version : 1.6.0
+(CAREFUL, This version breaks compatibility with the previous one, especially on signals)
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
@@ -68,14 +69,20 @@ So, in each State's script, you can implement the following abstract public func
 
 In any State node, you can call the following public functions:
 
-* `change_state("MyState")`
+* `change_state("MyState") -> State`
    where "MyState" is the name of an existing Node State. If two states have the same name, you MUST add the parent's name before change_state("Parent/Child")
 
 * `change_state("MyState", args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null)`
-   The "change_state" method accepts arguments, to be able to pass variables to some inherited enter or exit functions in your states' logic.
+   The "change_state" method accepts arguments, to be able to pass variables to some inherited enter or exit functions in your states' logic. If "MyState" == "", then it will be considered as self.
    
-* `goto_state("MyState")`
-   an alias for change_state(). Attention, no arguments allowed there !
+* `change_state_node(my_state) -> State`
+   Where my_state is an existing Node State. This function accepts the same arguments as change_state(). If no argument is entered, it will try to change state to self.
+   
+* `next_state() -> State`
+   Helper functions to change to the next non disabled sibling state (only if parent does not have_regions). It ends at the last sibling on this branch.
+   
+* `prev_state() -> State`
+   Helper functions to change to the previous non disabled sibling state (only if parent does not have_regions). It ends at the first sibling on this branch.
    
 * `is_active("MyState") -> bool`
    returns true if a state "MyState" is active in this xsm

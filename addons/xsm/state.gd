@@ -39,6 +39,12 @@ extends Node
 # In those scripts, you can call the public functions:
 #  change_state("MyState")
 #   "MyState" is the name of an existing Node State
+#  change_state_node(my_state)
+#   my_state is an existing State Node
+#  next_state()
+#   Helper function to change to the next non disabled sibling state in tree
+#  prev_state()
+#   Helper function to change to the previous non disabled sibling state in tree
 #  is_active("MyState") -> bool
 #   returns true if a state "MyState" is active in this xsm
 #  get_active_states() -> Dictionary:
@@ -184,76 +190,130 @@ func _on_timeout(_name: String) -> void:
 #
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
-func change_state(new_state: String, args_on_enter = null, args_after_enter = null,
+func change_state_node(new_state_node: State = null, args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
 
-	if not state_root.state_in_update:
-		if debug_mode:
-			print("[!!!] %s pending state : '%s' -> '%s'" % [target.name, get_name(), new_state])
-		state_root.new_pending_state(new_state, args_on_enter, args_after_enter,
-				args_before_exit, args_on_exit)
-		return null
-
-	if done_for_this_frame:
-		return null
-
-	# if change to empty or itself, cancel
-	if new_state == "" or new_state == get_name():
-		return null
-
-	# finds the path to next state, return if null, disabled or active
-	var new_state_node: State = find_state_node(new_state)
 	if new_state_node == null:
-		return null
+		new_state_node = self
 	if new_state_node.disabled:
 		return null
 	if new_state_node.status != INACTIVE:
 		return null
 
+	if not state_root.state_in_update:
+		# debug info
+		if state_root.debug_mode or debug_mode:
+			print("[!!!] %s pending state : '%s' -> '%s'" 
+					% [target.name, get_name(), new_state_node.get_name()])
+		# can't process, add to pending states
+		state_root.new_pending_state(new_state_node, args_on_enter, args_after_enter,
+				args_before_exit, args_on_exit)
+		return null
+
+	# Should avoid infinite loops of state changes
+	if done_for_this_frame:
+		return null	
+
+	# debug
 	if state_root.debug_mode or debug_mode:
 		var debug_lvl = ""
 		for i in state_root.changing_state_level:
 			debug_lvl += " ⎸"
-		print(debug_lvl, " /‾ %s changing state : '%s' -> '%s'" % [target.name, get_name(), new_state])
+		print(debug_lvl, " /‾ %s changing state : '%s' -> '%s'" % [target.name, get_name(), new_state_node.get_name()])
 		state_root.changing_state_level += 1
-	# compare the current path and the new one -> get the common_root
-	var common_root: State = get_common_root(new_state_node)
+
+	# get the closest active parent
+	var active_root: State = get_active_root(new_state_node)
 
 	# change the children status to EXITING
-	common_root.change_children_status_to_exiting()
+	active_root.change_children_status_to_exiting()
 	# exits all active children of the old branch,
-	# from farthest to common_root (excluded)
+	# from farthest to active_root (excluded)
 	# If EXITED, change the status to INACTIVE
-	common_root.exit_children(args_before_exit, args_on_exit)
+	active_root.exit_children(args_before_exit, args_on_exit)
 
 	# change the children status to ENTERING
-	common_root.change_children_status_to_entering(new_state_node.get_path())
+	active_root.change_children_status_to_entering(new_state_node.get_path())
 	# enters the nodes of the new branch from the parent to the next_state
 	# enters the first leaf of each following branch
 	# If ENTERED, change the status to ACTIVE
-	common_root.enter_children(args_on_enter, args_after_enter)
+	active_root.enter_children(args_on_enter, args_after_enter)
 
 	# sets this State as last_state for the new one
 	new_state_node.last_state = self
 
 	# set "done this frame" to avoid another round of state change in this branch
-	common_root.reset_done_this_frame(true)
+	active_root.reset_done_this_frame(true)
 
 	# signal the change
-	emit_signal("state_changed", self, new_state)
+	emit_signal("state_changed", self, new_state_node)
 	if not is_root() :
 		new_state_node.get_parent().emit_signal("substate_changed", new_state_node)
 	state_root.emit_signal("some_state_changed", self, new_state_node)
 
+	# debug
 	if state_root.debug_mode or debug_mode:
 		state_root.changing_state_level -= 1
 		var debug_lvl = ""
 		for i in state_root.changing_state_level:
 			debug_lvl += " ⎸"
-		print(debug_lvl, " \\_ %s changed state : '%s' -> '%s'" % [target.name, get_name(), new_state])
+		print(debug_lvl, " \\_ %s changed state : '%s' -> '%s'" % [target.name, get_name(), new_state_node.get_name()])
 		if debug_lvl == "":
 			print("")
+
 	return new_state_node
+
+
+func change_state(new_state: String, args_on_enter = null, args_after_enter = null,
+		args_before_exit = null, args_on_exit = null) -> State:
+
+	# finds the node of new_state, return self if empty
+	var new_state_node: State = find_state_node(new_state)
+
+	return change_state_node(new_state_node, args_on_enter, args_after_enter, args_before_exit, args_on_exit)
+
+
+# Two helper functions to change to the next non disabled sibling state
+# only if parent does not have_regions
+# it ends at the last sibling on this branch
+func next_state(args_on_enter = null, args_after_enter = null,
+		args_before_exit = null, args_on_exit = null) -> State:
+	
+	var parent = get_parent()
+	if parent.has_regions:
+		return null
+
+	var got_myself = false
+	for i in parent.get_child_count():
+		var sibling = parent.get_child(i)
+		if got_myself:
+			if not sibling.disabled:
+				return change_state_node(sibling, args_on_enter,
+					args_after_enter, args_before_exit, args_on_exit)
+		elif parent.get_child(i) == self:
+			got_myself = true
+	return null
+
+
+func prev_state(args_on_enter = null, args_after_enter = null,
+		args_before_exit = null, args_on_exit = null) -> State:
+	
+	var parent = get_parent()
+	if parent.has_regions:
+		return null
+
+	var got_myself = false
+	var i_max = parent.get_child_count() - 1
+	for i in parent.get_child_count():
+		var sibling = parent.get_child(i_max - i)
+		if got_myself:
+			if not sibling.disabled:
+				return change_state_node(sibling, args_on_enter,
+					args_after_enter, args_before_exit, args_on_exit)
+		elif parent.get_child(i_max - i) == self:
+			got_myself = true
+	return null
+
 
 
 # Old function name, if you used it, I... am sorry
@@ -275,14 +335,6 @@ func has_parent(state_node: State) -> bool:
 	if parent.get_class() != "State" or parent == state_root:
 		return false
 	return parent.has_parent(state_node)
-
-#func set_active(new_active: bool) -> void:
-#	if not status == INACTIVE and not new_active:
-#		status = INACTIVE
-#		state_root.remove_active_state(self)
-#	elif new_active and not status == ACTIVE:
-#		status = ACTIVE
-#		state_root.add_active_state(self)
 
 
 func is_active(state_name: String) -> bool:
@@ -416,7 +468,7 @@ func init_children_states(root_state: State, first_branch: bool) -> void:
 
 
 func find_state_node(new_state: String) -> State:
-	if get_name() == new_state:
+	if new_state == get_name() or new_state == "":
 		return self
 
 	var state_map: Dictionary = state_root.state_map
@@ -432,8 +484,7 @@ func find_state_node(new_state: String) -> State:
 	return null
 
 
-func get_common_root(new_state_node: State) -> State:
-	var new_path: NodePath = new_state_node.get_path()
+func get_active_root(new_state_node: State) -> State:
 	var result: State = new_state_node
 	while not result.status == ACTIVE and not result.is_root():
 		result = result.get_parent()
