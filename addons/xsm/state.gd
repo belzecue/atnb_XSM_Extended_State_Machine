@@ -39,7 +39,7 @@ extends Node
 # In those scripts, you can call the public functions:
 #  change_state("MyState")
 #   "MyState" is the name of an existing Node State
-#  change_state_node(my_state)
+#  change_state_node(my_state) or change_state_to()
 #   my_state is an existing State Node
 #  next_state()
 #   Helper function to change to the next non disabled sibling state in tree
@@ -190,6 +190,12 @@ func _on_timeout(_name: String) -> void:
 #
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
+func change_state_to(new_state_node: State = null, args_on_enter = null, args_after_enter = null,
+		args_before_exit = null, args_on_exit = null) -> State:
+	return change_state_node(new_state_node, args_on_enter, args_after_enter,
+			args_before_exit, args_on_exit)
+
+
 func change_state_node(new_state_node: State = null, args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
 
@@ -268,7 +274,7 @@ func change_state(new_state: String, args_on_enter = null, args_after_enter = nu
 		args_before_exit = null, args_on_exit = null) -> State:
 
 	# finds the node of new_state, return self if empty
-	var new_state_node: State = find_state_node(new_state)
+	var new_state_node: State = find_state_node_or_self(new_state)
 
 	return change_state_node(new_state_node, args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
@@ -280,40 +286,24 @@ func next_state(args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
 	
 	var parent = get_parent()
-	if parent.has_regions:
+	var pos = get_index()
+	if pos == parent.get_child_count() - 1:
 		return null
-
-	var got_myself = false
-	for i in parent.get_child_count():
-		var sibling = parent.get_child(i)
-		if got_myself:
-			if not sibling.disabled:
-				return change_state_node(sibling, args_on_enter,
-					args_after_enter, args_before_exit, args_on_exit)
-		elif parent.get_child(i) == self:
-			got_myself = true
-	return null
+	else:
+		return change_state_node( parent.get_child(pos + 1), args_on_enter,
+				args_after_enter, args_before_exit, args_on_exit)
 
 
 func prev_state(args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
 	
 	var parent = get_parent()
-	if parent.has_regions:
+	var pos = get_index()
+	if pos == 0:
 		return null
-
-	var got_myself = false
-	var i_max = parent.get_child_count() - 1
-	for i in parent.get_child_count():
-		var sibling = parent.get_child(i_max - i)
-		if got_myself:
-			if not sibling.disabled:
-				return change_state_node(sibling, args_on_enter,
-					args_after_enter, args_before_exit, args_on_exit)
-		elif parent.get_child(i_max - i) == self:
-			got_myself = true
-	return null
-
+	else:
+		return change_state_node( parent.get_child(pos - 1), args_on_enter,
+				args_after_enter, args_before_exit, args_on_exit)
 
 
 # Old function name, if you used it, I... am sorry
@@ -322,7 +312,7 @@ func prev_state(args_on_enter = null, args_after_enter = null,
 
 
 func change_state_if(new_state: String, if_state: String) -> State:
-	var s = find_state_node(if_state)
+	var s = find_state_node_or_self(if_state)
 	if s == null or s.status == ACTIVE:
 		return change_state(new_state)
 	return null
@@ -338,7 +328,7 @@ func has_parent(state_node: State) -> bool:
 
 
 func is_active(state_name: String) -> bool:
-	var s: State = find_state_node(state_name)
+	var s: State = find_state_node_or_self(state_name)
 	if s == null:
 		return false
 	return s.status == ACTIVE
@@ -356,7 +346,7 @@ func get_active_substate():
 
 
 func get_state(state_name: String) -> State:
-	return find_state_node(state_name)
+	return find_state_node_or_self(state_name)
 
 
 func get_active_states() -> Dictionary:
@@ -467,7 +457,7 @@ func init_children_states(root_state: State, first_branch: bool) -> void:
 				c.init_children_states(root_state, false)
 
 
-func find_state_node(new_state: String) -> State:
+func find_state_node_or_self(new_state: String) -> State:
 	if new_state == get_name() or new_state == "":
 		return self
 

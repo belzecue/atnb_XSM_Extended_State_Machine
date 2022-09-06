@@ -75,7 +75,7 @@ In any State node, you can call the following public functions:
 * `change_state("MyState", args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null)`
    The "change_state" method accepts arguments, to be able to pass variables to some inherited enter or exit functions in your states' logic. If "MyState" == "", then it will be considered as self.
    
-* `change_state_node(my_state) -> State`
+* `change_state_node(my_state) -> State` or `change_state_to(my_state) -> State`
    Where my_state is an existing Node State. This function accepts the same arguments as change_state(). If no argument is entered, it will try to change state to self.
    
 * `next_state() -> State`

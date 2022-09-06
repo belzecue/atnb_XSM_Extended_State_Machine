@@ -333,10 +333,6 @@ anim_on_enter = "Idle"
 
 [node name="Land" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 2 )
-disabled = null
-has_regions = null
-debug_mode = null
-anim_on_enter = null
 
 [node name="Walk" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
 script = ExtResource( 1 )
