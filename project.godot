@@ -20,6 +20,11 @@ _global_script_classes=[ {
 "path": "res://addons/xsm/state_loop.gd"
 }, {
 "base": "State",
+"class": "StateRegions",
+"language": "GDScript",
+"path": "res://addons/xsm/state_regions.gd"
+}, {
+"base": "State",
 "class": "StateRoot",
 "language": "GDScript",
 "path": "res://addons/xsm/state_root.gd"
@@ -27,13 +32,14 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "State": "",
 "StateLoop": "",
+"StateRegions": "",
 "StateRoot": ""
 }
 
 [application]
 
-config/name="XSM - Extended State Machine"
-run/main_scene="res://examples/old_example/example.tscn"
+config/name="XSM - eXtended State Machine"
+run/main_scene="res://examples/platformer/platformer_example.tscn"
 config/icon="res://icon.png"
 
 [display]

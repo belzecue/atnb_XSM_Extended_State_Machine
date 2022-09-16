@@ -203,8 +203,11 @@ Special Thanks
 To TealOrbiter and Frontrider1 for such kind and useful suggestions that make xsm getting better each version.
 
 To flaticon.com and whoever made the icons used :
+  ```
   https://www.flaticon.com/free-icon-font/chart-network_5528059
   https://www.flaticon.com/free-icon-font/chart-tree_5528048
+  https://www.flaticon.com/free-icon-font/chart-connected_5528111
+  ```
 
 To piratesephiroth and MadFlyFish for a C# port : https://github.com/MadFlyFish/XSM-Csharp
 

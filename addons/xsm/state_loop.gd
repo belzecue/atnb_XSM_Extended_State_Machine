@@ -24,11 +24,12 @@ extends State
 signal looped()
 
 
-var moving_forward = true
+var moving_forward := true
 
-# Based on the enum of AudioStreamSample for coherence
+export(NodePath) var exit_node
+# Based on the loop_mode enum of AudioStreamSample for coherence
 enum LoopMode {LOOP_DISABLED, LOOP_FORWARD, LOOP_BACKWARD, LOOP_PING_PONG}
-export(LoopMode) var loop_mode = LoopMode.LOOP_FORWARD setget set_loop_mode
+export(LoopMode) var loop_mode := LoopMode.LOOP_FORWARD setget set_loop_mode
 
 #
 # INIT
@@ -40,13 +41,13 @@ func set_loop_mode(value):
 
 
 #
-# PROCESS
-#
-
-#
 # PUBLIC FUNCTIONS
 #
-func next():
+func next(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null):
+
+	if get_child_count() == 0:
+		return
+
 	var current_index = get_active_substate().get_index()
 	var next_index = current_index + 1
 
@@ -55,7 +56,7 @@ func next():
 			return
 
 		LoopMode.LOOP_FORWARD:
-			if get_child_count() == next_index:
+			if next_index == get_child_count():
 				next_index = 0
 
 		LoopMode.LOOP_BACKWARD:
@@ -65,18 +66,52 @@ func next():
 
 		LoopMode.LOOP_PING_PONG:
 			if moving_forward:
-				if get_child_count() == next_index:
-					todo changer de sens
-
-				var next_state = get_active_substate().next_state()
-
+				if next_index == get_child_count():
+					next_index = current_index -1
+					moving_forward = false
 			else:
-				get_active_substate().prev_state()
+				next_index = current_index - 1
+				if next_index < 0:
+					next_index = 1
+					moving_forward = true
 
-	change_state_node(get_child(next_index))
+	change_state_node(get_child(next_index), args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
 
+func prev(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null):
+	var current_index = get_active_substate().get_index()
+	var next_index = current_index + 1
 
+	match loop_mode:
+		LoopMode.LOOP_DISABLED:
+			return
+
+		LoopMode.LOOP_FORWARD:
+			next_index = current_index -1
+			if next_index < 0:
+				next_index = get_child_count() - 1
+
+		LoopMode.LOOP_BACKWARD:
+			if next_index == get_child_count():
+				next_index = 0
+
+		LoopMode.LOOP_PING_PONG:
+			if moving_forward:
+				next_index = current_index - 1
+				if next_index < 0:
+					next_index = 1
+					moving_forward = false
+			else:
+				if next_index == get_child_count():
+					next_index = current_index -1
+					moving_forward = true
+
+	change_state_node(get_child(next_index), args_on_enter, args_after_enter, args_before_exit, args_on_exit)
+
+
+func exit_loop(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null):
+	var exit_target = get_node(exit_node)
+	change_state(exit_target, args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
 #
 # PRIVATE FUNCTIONS

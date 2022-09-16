@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/grass.png-8a1fc4ef9a814e4752d6302fe25dd24e.stex"
+path="res://.import/state_regions.png-d26532c865e2f1b0ed5aacdd878c308c.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://examples/old_example/assets/grass.png"
-dest_files=[ "res://.import/grass.png-8a1fc4ef9a814e4752d6302fe25dd24e.stex" ]
+source_file="res://addons/xsm/state_regions.png"
+dest_files=[ "res://.import/state_regions.png-d26532c865e2f1b0ed5aacdd878c308c.stex" ]
 
 [params]
 
@@ -19,7 +19,7 @@ compress/lossy_quality=0.7
 compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
-flags/repeat=1
+flags/repeat=0
 flags/filter=false
 flags/mipmaps=false
 flags/anisotropic=false

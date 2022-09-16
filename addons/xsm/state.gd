@@ -84,13 +84,13 @@ signal disabled()
 signal enabled()
 
 export var disabled := false setget set_disabled
-export var has_regions := false
 export var debug_mode := false
 export(NodePath) var fsm_owner = null
 export(NodePath) var animation_player = null
 export var anim_on_enter := ""
+# Has been moved to create a StateRegions Node
+# export var has_regions := false
 
-#var active := false
 enum {INACTIVE, ENTERING, ACTIVE, EXITING}
 var status := INACTIVE
 var state_root: State = null
@@ -268,8 +268,8 @@ func change_state_node(new_state_node: State = null, args_on_enter = null, args_
 		for i in state_root.changing_state_level:
 			debug_lvl += " ⎸"
 		print(debug_lvl, " \\_ %s changed state : '%s' -> '%s'" % [target.name, get_name(), new_state_node.get_name()])
-		if debug_lvl == "":
-			print("")
+		# if debug_lvl == "":
+		# 	print("")
 
 	return new_state_node
 
@@ -281,38 +281,6 @@ func change_state(new_state: String, args_on_enter = null, args_after_enter = nu
 	var new_state_node: State = find_state_node_or_self(new_state)
 
 	return change_state_node(new_state_node, args_on_enter, args_after_enter, args_before_exit, args_on_exit)
-
-
-# Two helper functions to change to the next non disabled sibling state
-# only if parent does not have_regions
-# it ends at the last sibling on this branch
-func next_state(args_on_enter = null, args_after_enter = null,
-		args_before_exit = null, args_on_exit = null) -> State:
-	
-	var parent = get_parent()
-	var pos = get_index()
-	if pos == parent.get_child_count() - 1:
-		return null
-	else:
-		return change_state_node( parent.get_child(pos + 1), args_on_enter,
-				args_after_enter, args_before_exit, args_on_exit)
-
-
-func prev_state(args_on_enter = null, args_after_enter = null,
-		args_before_exit = null, args_on_exit = null) -> State:
-	
-	var parent = get_parent()
-	var pos = get_index()
-	if pos == 0:
-		return null
-	else:
-		return change_state_node( parent.get_child(pos - 1), args_on_enter,
-				args_after_enter, args_before_exit, args_on_exit)
-
-
-# Old function name, if you used it, I... am sorry
-# func goto_state(new_state: String) -> void:
-# 	change_state(new_state)
 
 
 func change_state_if(new_state: String, if_state: String) -> State:
@@ -338,14 +306,11 @@ func is_active(state_name: String) -> bool:
 	return s.status == ACTIVE
 
 
-# returns the first active substate or all children if has_regions
+# returns the first active substate or or null
 func get_active_substate():
-	if has_regions and status == ACTIVE:
-		return get_children()
-	else:
-		for c in get_children():
-			if c.status == ACTIVE:
-				return c
+	for c in get_children():
+		if c.status == ACTIVE:
+			return c
 	return null
 
 
@@ -451,7 +416,7 @@ func init_children_states(root_state: State, first_branch: bool) -> void:
 				c.target = root_state.target
 			if c.anim_player == null:
 				c.anim_player = root_state.anim_player
-			if first_branch and ( has_regions or c == get_child(0) ):
+			if first_branch and c == get_child(0):
 				c.status = ACTIVE
 				c.enter()
 				c.last_state = root_state
@@ -504,15 +469,10 @@ func update_active_states(_delta: float) -> void:
 
 
 func change_children_status_to_exiting() -> void:
-	if has_regions:
-		for c in get_children():
+	for c in get_children():
+		if c.get_class() == "State" and c.status != INACTIVE:
 			c.status = EXITING
 			c.change_children_status_to_exiting()
-	else:
-		for c in get_children():
-			if c.get_class() == "State" and c.status != INACTIVE:
-				c.status = EXITING
-				c.change_children_status_to_exiting()
 
 
 func exit(args = null) -> void:
@@ -533,12 +493,6 @@ func exit_children(args_before_exit = null, args_on_exit = null) -> void:
 
 
 func change_children_status_to_entering(new_state_path: NodePath) -> void:
-	if has_regions:
-		for c in get_children():
-			c.status = ENTERING
-			c.change_children_status_to_entering(new_state_path)
-			return
-
 	var new_state_lvl: int = new_state_path.get_name_count()
 	var current_lvl: int = get_path().get_name_count()
 	if new_state_lvl > current_lvl:
@@ -570,16 +524,8 @@ func enter(args = null) -> void:
 func enter_children(args_on_enter = null, args_after_enter = null) -> void:
 	if disabled:
 		return
-	# if hasregions, enter all children and that's all
 	# if newstate's path tall enough, enter child that fits newstate's current lvl
 	# else newstate's path smaller than here, enter first child
-	if has_regions:
-		for c in get_children():
-			c.enter(args_on_enter)
-			c.enter_children(args_on_enter, args_after_enter)
-			c._after_enter(args_after_enter)
-		return
-
 	for c in get_children():
 		if c.get_class() == "State" and c.status == ENTERING:
 			c.enter(args_on_enter)

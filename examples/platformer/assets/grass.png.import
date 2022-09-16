@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/slime.png-bfc4a73d917bdce877a9bc0720370f5a.stex"
+path="res://.import/grass.png-e9d74b45709f6317b8ca6a8d3f14d0c0.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://examples/old_example/assets/slime.png"
-dest_files=[ "res://.import/slime.png-bfc4a73d917bdce877a9bc0720370f5a.stex" ]
+source_file="res://examples/platformer/assets/grass.png"
+dest_files=[ "res://.import/grass.png-e9d74b45709f6317b8ca6a8d3f14d0c0.stex" ]
 
 [params]
 
@@ -19,8 +19,8 @@ compress/lossy_quality=0.7
 compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
-flags/repeat=0
-flags/filter=true
+flags/repeat=1
+flags/filter=false
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2
