@@ -1,23 +1,23 @@
 [gd_scene load_steps=36 format=2]
 
-[ext_resource path="res://example/old_example/states/movements/walk.gd" type="Script" id=1]
-[ext_resource path="res://example/old_example/states/movements/land.gd" type="Script" id=2]
-[ext_resource path="res://example/old_example/states/color.gd" type="Script" id=3]
-[ext_resource path="res://example/old_example/states/movements/idle.gd" type="Script" id=4]
-[ext_resource path="res://example/old_example/states/movements/in_air.gd" type="Script" id=5]
-[ext_resource path="res://addons/xsm/state_root.gd" type="Script" id=7]
-[ext_resource path="res://example/old_example/player.gd" type="Script" id=8]
-[ext_resource path="res://example/old_example/states/movements/on_ground.gd" type="Script" id=9]
-[ext_resource path="res://example/old_example/assets/slime.png" type="Texture" id=10]
-[ext_resource path="res://example/old_example/assets/grass.png" type="Texture" id=11]
-[ext_resource path="res://example/old_example/assets/font_TIMESS__.ttf" type="DynamicFontData" id=12]
-[ext_resource path="res://example/old_example/states/movements/crouch.gd" type="Script" id=13]
-[ext_resource path="res://example/old_example/states/movements/jump.gd" type="Script" id=14]
-[ext_resource path="res://example/old_example/states/colors/green.gd" type="Script" id=15]
-[ext_resource path="res://example/old_example/states/colors/purple.gd" type="Script" id=16]
-[ext_resource path="res://example/old_example/states/movement.gd" type="Script" id=17]
-[ext_resource path="res://example/old_example/states/colors/orange.gd" type="Script" id=18]
-[ext_resource path="res://example/old_example/states/movements/fall.gd" type="Script" id=19]
+[ext_resource path="res://examples/old_example/states/movements/in_air.gd" type="Script" id=1]
+[ext_resource path="res://examples/old_example/states/movements/idle.gd" type="Script" id=2]
+[ext_resource path="res://examples/old_example/states/color.gd" type="Script" id=3]
+[ext_resource path="res://addons/xsm/state_root.gd" type="Script" id=4]
+[ext_resource path="res://examples/old_example/states/movements/walk.gd" type="Script" id=5]
+[ext_resource path="res://examples/old_example/assets/font_TIMESS__.ttf" type="DynamicFontData" id=6]
+[ext_resource path="res://examples/old_example/states/movements/land.gd" type="Script" id=7]
+[ext_resource path="res://examples/old_example/player.gd" type="Script" id=8]
+[ext_resource path="res://examples/old_example/states/movements/on_ground.gd" type="Script" id=9]
+[ext_resource path="res://examples/old_example/assets/grass.png" type="Texture" id=10]
+[ext_resource path="res://examples/old_example/states/movements/crouch.gd" type="Script" id=11]
+[ext_resource path="res://examples/old_example/assets/slime.png" type="Texture" id=12]
+[ext_resource path="res://examples/old_example/states/colors/green.gd" type="Script" id=13]
+[ext_resource path="res://examples/old_example/states/movements/jump.gd" type="Script" id=14]
+[ext_resource path="res://examples/old_example/states/colors/purple.gd" type="Script" id=15]
+[ext_resource path="res://examples/old_example/states/movement.gd" type="Script" id=16]
+[ext_resource path="res://examples/old_example/states/colors/orange.gd" type="Script" id=17]
+[ext_resource path="res://examples/old_example/states/movements/fall.gd" type="Script" id=18]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 11.2744
@@ -269,7 +269,7 @@ extents = Vector2( 100, 5 )
 
 [sub_resource type="DynamicFont" id=17]
 size = 20
-font_data = ExtResource( 12 )
+font_data = ExtResource( 6 )
 
 [node name="Example" type="Node2D"]
 
@@ -286,7 +286,7 @@ visible = false
 shape = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="Player"]
-texture = ExtResource( 10 )
+texture = ExtResource( 12 )
 hframes = 7
 frame = 3
 
@@ -306,20 +306,20 @@ anims/TopCurve = SubResource( 13 )
 anims/Walk = SubResource( 14 )
 
 [node name="StateRoot" type="Node" parent="Player"]
-script = ExtResource( 7 )
+script = ExtResource( 4 )
 has_regions = true
 debug_mode = true
 fsm_owner = NodePath("..")
 animation_player = NodePath("../AnimationPlayer")
 
 [node name="RegionMovement" type="Node" parent="Player/StateRoot"]
-script = ExtResource( 17 )
+script = ExtResource( 16 )
 
 [node name="InAir" type="Node" parent="Player/StateRoot/RegionMovement"]
-script = ExtResource( 5 )
+script = ExtResource( 1 )
 
 [node name="Fall" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
-script = ExtResource( 19 )
+script = ExtResource( 18 )
 
 [node name="Jump" type="Node" parent="Player/StateRoot/RegionMovement/InAir"]
 script = ExtResource( 14 )
@@ -328,31 +328,31 @@ script = ExtResource( 14 )
 script = ExtResource( 9 )
 
 [node name="Idle" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
-script = ExtResource( 4 )
+script = ExtResource( 2 )
 anim_on_enter = "Idle"
 
 [node name="Land" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
-script = ExtResource( 2 )
+script = ExtResource( 7 )
 
 [node name="Walk" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
-script = ExtResource( 1 )
+script = ExtResource( 5 )
 
 [node name="Crouch" type="Node" parent="Player/StateRoot/RegionMovement/OnGround"]
-script = ExtResource( 13 )
+script = ExtResource( 11 )
 
 [node name="RegionColor" type="Node" parent="Player/StateRoot"]
 script = ExtResource( 3 )
 
 [node name="Purple" type="Node" parent="Player/StateRoot/RegionColor"]
-script = ExtResource( 16 )
-fsm_owner = NodePath("../../../Sprite")
-
-[node name="Green" type="Node" parent="Player/StateRoot/RegionColor"]
 script = ExtResource( 15 )
 fsm_owner = NodePath("../../../Sprite")
 
+[node name="Green" type="Node" parent="Player/StateRoot/RegionColor"]
+script = ExtResource( 13 )
+fsm_owner = NodePath("../../../Sprite")
+
 [node name="Orange" type="Node" parent="Player/StateRoot/RegionColor"]
-script = ExtResource( 18 )
+script = ExtResource( 17 )
 fsm_owner = NodePath("../../../Sprite")
 
 [node name="Platforms" type="Node2D" parent="."]
@@ -366,7 +366,7 @@ shape = SubResource( 15 )
 
 [node name="Sprite" type="Sprite" parent="Platforms/Ground"]
 position = Vector2( 0, 144 )
-texture = ExtResource( 11 )
+texture = ExtResource( 10 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 4096, 10 )
 
@@ -378,7 +378,7 @@ shape = SubResource( 16 )
 one_way_collision = true
 
 [node name="Sprite" type="Sprite" parent="Platforms/Platform1"]
-texture = ExtResource( 11 )
+texture = ExtResource( 10 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 200, 10 )
 
@@ -390,7 +390,7 @@ shape = SubResource( 16 )
 one_way_collision = true
 
 [node name="Sprite" type="Sprite" parent="Platforms/Platform2"]
-texture = ExtResource( 11 )
+texture = ExtResource( 10 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 200, 10 )
 
