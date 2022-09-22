@@ -82,6 +82,10 @@ signal substate_exited(sender)
 signal substate_changed(sender)
 signal disabled()
 signal enabled()
+signal some_state_changed(sender_node, new_state_node)
+signal pending_state_changed(added_state_node)
+signal pending_state_added(new_state_name)
+signal active_state_list_changed(active_states_list)
 
 export var disabled := false setget set_disabled
 export var debug_mode := false
@@ -90,6 +94,7 @@ export(NodePath) var animation_player = null
 export var anim_on_enter := ""
 # Has been moved to create a StateRegions Node
 # export var has_regions := false
+
 
 enum {INACTIVE, ENTERING, ACTIVE, EXITING}
 var status := INACTIVE
@@ -104,6 +109,21 @@ var last_state: State = null
 var done_for_this_frame := false
 var state_in_update := false
 
+# Root variables
+var pending_states := [] setget , get_pending_states
+# This one is for the root state only. Allows XSM to avoid name redundancy
+# Empty for any other state
+var state_map := {} setget , get_state_map
+# Those were only for the root
+# Now each state has all its active children history stored
+var duplicate_names := {} setget , get_duplicate_names # Stores number of times a state_name is duplicated
+var active_states := {} setget , get_active_states
+var active_states_history := [] setget , get_active_states_history
+# Is exported in "_get_property_list():"
+var history_size := 6
+
+# For debug beautyprint
+var changing_state_level := 0
 
 #
 # INIT
@@ -112,10 +132,19 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	if fsm_owner != null:
-		target = get_node(fsm_owner)
+		target = get_node_or_null(fsm_owner)
 	if animation_player != null:
-		anim_player = get_node(animation_player)
+		anim_player = get_node_or_null(animation_player)
 
+	# all the root init logic here 
+	if is_root():
+		if fsm_owner == null and get_parent() != null:
+			target = get_parent()
+		state_map[name] = self
+		init_children_state_map(state_map, self)
+		enter()
+		init_children_states(self, true)
+		_after_enter(null)
 
 
 func _get_configuration_warning() -> String:
@@ -123,6 +152,18 @@ func _get_configuration_warning() -> String:
 		if c.get_class() != "State":
 			return "Error : this Node has a non State child (%s)" % c.get_name()
 	return ""
+
+
+# We want to add some export variables to the root State
+func _get_property_list():
+	var properties = []
+	if is_root():
+		# Same as "export(int) var my_property"
+		properties.append({
+			name = "history_size",
+			type = TYPE_INT
+		})
+	return properties
 
 
 func set_disabled(new_disabled: bool) -> void:
@@ -158,6 +199,58 @@ func init_children_state_map(dict: Dictionary, new_state_root: State):
 		else:
 			dict[c.name] = c
 		c.init_children_state_map(dict, state_root)
+
+
+#
+# SETTERS AND GETTERS
+# Those make sure that any access to those variables return the root one
+# Does not work in an inherited class ???
+# This is solved in Godot 4 !!! (hurray)
+#
+func get_pending_states():
+	if is_root():
+		return pending_states
+	return state_root.pending_states
+
+
+func get_state_map():
+	if is_root():
+		return state_map
+	return state_root.state_map
+
+
+func get_duplicate_names():
+	if is_root():
+		return duplicate_names
+	return state_root.duplicate_names
+
+
+func get_active_states():
+	if is_root():
+		return active_states
+	return state_root.active_states
+
+
+func get_active_states_history():
+	if is_root():
+		return active_states_history
+	return state_root.active_states_history
+
+
+#
+# PROCESS - Use update() to add state logic
+#
+func _physics_process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
+	if not disabled and status == ACTIVE:
+		if is_root():
+			# First of all, reset the anti loop system
+			reset_done_this_frame(false)
+			# Then update every active state
+			update_active_states(_delta)
+			# Finally, update root's active states history dictionnary
+			add_to_active_states_history(active_states.duplicate())
 
 
 #
@@ -274,7 +367,7 @@ func change_state_node(new_state_node: State = null, args_on_enter = null, args_
 	return new_state_node
 
 
-func change_state(new_state: String, args_on_enter = null, args_after_enter = null,
+func change_state(new_state: String = "", args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
 
 	# finds the node of new_state, return self if empty
@@ -318,8 +411,19 @@ func get_state(state_name: String) -> State:
 	return find_state_node_or_self(state_name)
 
 
-func get_active_states() -> Dictionary:
-	return state_root.active_states
+# index 0 is the most recent history
+func get_previous_active_states(history_id: int = 0) -> Dictionary:
+	if active_states_history.empty():
+		return Dictionary()
+	if active_states_history.size() <= history_id:
+		return active_states_history[0]
+	return active_states_history[history_id]
+
+
+# CAREFUL IF YOU HAVE TWO STATES WITH THE SAME NAME, THE "state_name"
+# SHOULD BE OF THE FORM "ParentName/ChildName"
+func was_state_active(state_name: String, history_id: int = 0) -> bool:
+	return get_previous_active_states(history_id).has(state_name)
 
 
 func play(anim: String, custom_speed: float = 1.0, from_end: bool = false) -> void:
@@ -426,19 +530,56 @@ func init_children_states(root_state: State, first_branch: bool) -> void:
 				c.init_children_states(root_state, false)
 
 
+# update the root active states history each frame
+func add_to_active_states_history(new_active_states: Dictionary) -> void:
+	state_root.active_states_history.push_front(new_active_states)
+	while state_root.active_states_history.size() > history_size:
+		var _last: Dictionary = active_states_history.pop_back()
+
+
+# Remove a state from active states list
+func remove_active_state(state_to_erase: State) -> void:
+	var state_name: String = state_to_erase.name
+	var name_in_state_map: String = state_name
+	if not state_root.state_map.has(state_name):
+		var parent_name: String = state_to_erase.get_parent().name
+		name_in_state_map = str("%s/%s" % [parent_name, state_name])
+	state_root.active_states.erase(name_in_state_map)
+	# var ancester = self
+	# while ancester.get_class() == "State":
+	# 	ancester.active_states.erase(name_in_state_map)
+	# 	ancester = ancester.get_parent()
+	emit_signal("active_state_list_changed", state_root.active_states)
+
+
+# Add to active states list
+func add_active_state(state_to_add: State) -> void:
+	var state_name: String = state_to_add.name
+	var name_in_state_map: String = state_name
+	if not state_root.state_map.has(state_name):
+		var parent_name: String = state_to_add.get_parent().name
+		name_in_state_map = str("%s/%s" % [parent_name, state_name])
+	state_root.active_states[name_in_state_map] = state_to_add
+	# var ancester = self
+	# while ancester.get_class() == "State":
+	# 	ancester.active_states[name_in_state_map] = state_to_add
+	# 	ancester = ancester.get_parent()
+	emit_signal("active_state_list_changed", state_root.active_states)
+
+
 func find_state_node_or_self(new_state: String) -> State:
 	if new_state == get_name() or new_state == "":
 		return self
 
-	var state_map: Dictionary = state_root.state_map
-	if state_map.has(new_state):
-		return state_map[new_state]
+	var map: Dictionary = state_root.state_map
+	if map.has(new_state):
+		return map[new_state]
 
 	if state_root.duplicate_names.has(new_state):
-		if state_map.has( str("%s/%s" % [name, new_state]) ):
-			return state_map[ str("%s/%s" % [name, new_state]) ]
-		elif state_map.has( str("%s/%s" % [get_parent().name, new_state]) ):
-			return state_map[ str("%s/%s" % [get_parent().name, new_state]) ]
+		if map.has( str("%s/%s" % [name, new_state]) ):
+			return map[ str("%s/%s" % [name, new_state]) ]
+		elif map.has( str("%s/%s" % [get_parent().name, new_state]) ):
+			return map[ str("%s/%s" % [get_parent().name, new_state]) ]
 
 	return null
 
@@ -460,6 +601,17 @@ func update_active_states(_delta: float) -> void:
 	if disabled:
 		return
 	state_in_update = true
+	if self == state_root:
+		# activate the pending states for the root
+		while pending_states.size() > 0:
+			var new_state_with_args = pending_states.pop_front()
+			var new_state_node: State = new_state_with_args[0]
+			var arg1 = new_state_with_args[1]
+			var arg2 = new_state_with_args[2]
+			var arg3 = new_state_with_args[3]
+			var arg4 = new_state_with_args[4]
+			var new_state: State = change_state_node(new_state_node, arg1, arg2, arg3, arg4)
+			emit_signal("pending_state_changed", new_state)
 	update(_delta)
 	for c in get_children():
 		if c.get_class() == "State" and c.status == ACTIVE and !c.done_for_this_frame:
@@ -468,6 +620,7 @@ func update_active_states(_delta: float) -> void:
 	state_in_update = false
 
 
+# In case of exit, exit the whole branch
 func change_children_status_to_exiting() -> void:
 	for c in get_children():
 		if c.get_class() == "State" and c.status != INACTIVE:
@@ -479,6 +632,7 @@ func exit(args = null) -> void:
 	del_timers()
 	_on_exit(args)
 	status = INACTIVE
+	remove_active_state(self)
 	emit_signal("state_exited", self)
 	if not is_root():
 		get_parent().emit_signal("substate_exited", self)
@@ -513,6 +667,7 @@ func enter(args = null) -> void:
 	if disabled:
 		return
 	status = ACTIVE
+	add_active_state(self)
 	if anim_on_enter != "":
 		play(anim_on_enter)
 	_on_enter(args)
@@ -540,6 +695,22 @@ func reset_children_status():
 			c.reset_children_status()
 
 
+# States added here will be changed on next xsm update
+# Careful, this is only for the root !!!
+func new_pending_state(new_state_node: State, args_on_enter = null,
+		args_after_enter = null, args_before_exit = null,
+		args_on_exit = null) -> void:
+	var new_state_array := []
+	new_state_array.append(new_state_node)
+	new_state_array.append(args_on_enter)
+	new_state_array.append(args_after_enter)
+	new_state_array.append(args_before_exit)
+	new_state_array.append(args_on_exit)
+	# self should be state_root
+	state_root.pending_states.append(new_state_array)
+	emit_signal("pending_state_added", new_state_node)
+
+
 func _on_timer_timeout(name: String) -> void:
 	del_timer(name)
 	_on_timeout(name)
@@ -547,19 +718,14 @@ func _on_timer_timeout(name: String) -> void:
 
 func reset_done_this_frame(new_done: bool) -> void:
 	done_for_this_frame = new_done
-	if not is_atomic():
-		for c in get_children():
-			if c.get_class() == "State":
-				c.reset_done_this_frame(new_done)
+	for c in get_children():
+		if c.get_class() == "State":
+			c.reset_done_this_frame(new_done)
 
 
 func get_class() -> String:
 	return "State"
 
 
-func is_atomic() -> bool:
-	return get_child_count() == 0
-
-
 func is_root() -> bool:
-	return false
+	return get_parent().get_class() != "State"

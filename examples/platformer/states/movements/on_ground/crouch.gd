@@ -3,8 +3,10 @@ extends State
 
 
 # FUNCTIONS TO INHERIT #
-func _on_enter(_args):
-	play("Crouch")
+
+# COMMENTED: DEFAULT ANIMATION IS SET IN THE INSPECTOR in Crouch State
+# func _on_enter(_args):
+# 	play("Crouch")
 
 
 func _on_update(_delta):

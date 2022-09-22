@@ -3,6 +3,9 @@ extends State
 
 
 # FUNCTIONS TO INHERIT #
+func _on_enter(_args) -> void:
+	var _st = change_state("CanJump")
+
 
 func _on_update(delta):
 	if target.dir != 0:

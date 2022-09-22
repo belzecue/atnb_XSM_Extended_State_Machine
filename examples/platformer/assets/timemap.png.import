@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/state_root.png-881cce7e6be9fcaee45dca56f0b16494.stex"
+path="res://.import/timemap.png-0937bfbe0feb046f20dc7b8446f65448.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/xsm/state_root.png"
-dest_files=[ "res://.import/state_root.png-881cce7e6be9fcaee45dca56f0b16494.stex" ]
+source_file="res://examples/platformer/assets/timemap.png"
+dest_files=[ "res://.import/timemap.png-0937bfbe0feb046f20dc7b8446f65448.stex" ]
 
 [params]
 

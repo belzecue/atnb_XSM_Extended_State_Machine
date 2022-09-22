@@ -4,7 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 
-# COMMENTED BECAUSE A DEFAULT ANIMATION IS SET IN THE INSPECTOR
+# COMMENTED: DEFAULT ANIMATION IS SET IN THE INSPECTOR in Idle State
 # func _on_enter(_args):
 # 	play("Idle")
 
@@ -15,4 +15,4 @@ func _on_update(_delta):
 
 
 func _on_land_finished():
-	var _s = change_state_node()
+	var _s = change_state()

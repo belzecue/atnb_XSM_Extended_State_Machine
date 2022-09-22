@@ -26,7 +26,7 @@ signal looped()
 
 var moving_forward := true
 
-export(NodePath) var exit_node
+export(NodePath) var exit_state
 # Based on the loop_mode enum of AudioStreamSample for coherence
 enum LoopMode {LOOP_DISABLED, LOOP_FORWARD, LOOP_BACKWARD, LOOP_PING_PONG}
 export(LoopMode) var loop_mode := LoopMode.LOOP_FORWARD setget set_loop_mode
@@ -110,8 +110,10 @@ func prev(args_on_enter = null, args_after_enter = null, args_before_exit = null
 
 
 func exit_loop(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null):
-	var exit_target = get_node(exit_node)
-	change_state(exit_target, args_on_enter, args_after_enter, args_before_exit, args_on_exit)
+	if exit_state == "":
+		return
+	var exit_node = get_node(exit_state)
+	change_state_node(exit_node, args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
 #
 # PRIVATE FUNCTIONS

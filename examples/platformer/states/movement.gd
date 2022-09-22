@@ -9,10 +9,12 @@ func _on_update(delta):
 
 	if Input.is_action_pressed("left"):
 		target.dir = -1
-		if !target.get_node("Sprite").flip_h: target.get_node("Sprite").flip_h = true
+		if !target.get_node("Skin").flip_h: 
+			target.get_node("Skin").flip_h = true
 	elif Input.is_action_pressed("right"):
 		target.dir = 1
-		if target.get_node("Sprite").flip_h: target.get_node("Sprite").flip_h = false
+		if target.get_node("Skin").flip_h: 
+			target.get_node("Skin").flip_h = false
 
 	target.velocity.y += delta * target.gravity
 
