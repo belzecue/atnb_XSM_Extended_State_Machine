@@ -15,9 +15,9 @@ func _on_update(_delta) -> void:
 
 func choose_jump():
 	if is_active("OnWall"):
-		change_state("WallJump")
+		var _st = change_state("WallJump")
 	else:
-		change_state("GroundJump")
+		var _st = change_state("GroundJump")
 
 
 func _on_CanPreJump_pre_jumped():

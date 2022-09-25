@@ -5,7 +5,8 @@ extends State
 # FUNCTIONS AVAILABLE TO INHERIT
 
 func _on_enter(_args) -> void:
-	play("Jump")
+	# Commented because it is defined in the inspector as "Anim_on_enter"
+	# play("Jump")
 
 	# This tween is to have the jump preparation appear still on ground
 	# tweek the values according to your sprite size, and jump speed
@@ -20,7 +21,3 @@ func _on_enter(_args) -> void:
 func jump():
 	target.velocity.y = - target.jump_speed
 
-
-func _on_exit(_args):
-	target.get_node("Skin").position.y = 0
-	

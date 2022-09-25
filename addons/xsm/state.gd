@@ -42,11 +42,6 @@ extends Node
 #   "MyState" is the name of an existing Node State
 #  change_state_node(my_state) or change_state_to()
 #   my_state is an existing State Node
-#  next_state()
-#   Helper function to change to the next non disabled sibling state in tree
-#  prev_state()
-#   Helper function to change to the previous non disabled sibling state in tree
-#
 #  is_active("MyState") -> bool
 #   returns true if a state "MyState" is active in this xsm
 #  get_active_states() -> Dictionary:
