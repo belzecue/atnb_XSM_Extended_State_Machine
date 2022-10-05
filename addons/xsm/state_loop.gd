@@ -15,7 +15,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 tool
-class_name StateLoop
+class_name StateLoop, "res://addons/xsm/state_loop.png"
 extends State
 
 # StateLoop allows for easy navigation in its substates
@@ -40,10 +40,62 @@ func set_loop_mode(value):
 		moving_forward = false
 
 
+
+# We want to add some export variables in their categories
+# And separate those of the root state
+func _get_property_list():
+	var properties = []
+
+	# Adds a State category in the inspector
+	properties.append({
+		name = "StateLoop",
+		type = TYPE_NIL,
+		usage = PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SCRIPT_VARIABLE
+	})
+	
+	var serialized_enum = ""
+	for k in LoopMode.keys():
+		serialized_enum = "%s:%s,%s" % [k, LoopMode[k], serialized_enum]
+	serialized_enum = serialized_enum.substr(0, serialized_enum.length()-1)
+	properties.append({
+		name = "loop_mode",
+		type = TYPE_INT,
+		hint = PROPERTY_HINT_ENUM, 
+		"hint_string": serialized_enum
+	})
+	properties.append({
+		name = "exit_state",
+		type = TYPE_NODE_PATH
+	})
+
+	return properties
+
+# func _default_next_state() -> NodePath:
+# 	match loop_mode:
+# 		LoopMode.LOOP_DISABLED:
+# 			return NodePath()
+
+# 		LoopMode.LOOP_FORWARD:
+# 			if get_position_in_parent() >= get_parent().get_child_count() - 1:
+# 				return NodePath()
+# 			return get_parent().get_child(get_position_in_parent() + 1).get_path()
+
+# 		LoopMode.LOOP_BACKWARD:
+# 			if get_position_in_parent() == 0:
+# 				return NodePath()
+# 			return get_parent().get_child(get_position_in_parent() - 1).get_path()
+
+# 		LoopMode.LOOP_PING_PONG:
+# 			if get_position_in_parent() >= get_parent().get_child_count() - 1:
+# 				return NodePath()
+# 			return get_parent().get_child(get_position_in_parent() + 1).get_path()
+# 	return NodePath()
+
+
 #
 # PUBLIC FUNCTIONS
 #
-func next(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null):
+func next_in_loop(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null):
 
 	if get_child_count() == 0:
 		return
@@ -78,7 +130,7 @@ func next(args_on_enter = null, args_after_enter = null, args_before_exit = null
 	change_state_node(get_child(next_index), args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
 
-func prev(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null):
+func prev_in_loop(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null):
 	var current_index = get_active_substate().get_index()
 	var next_index = current_index + 1
 

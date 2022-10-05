@@ -1,22 +1,23 @@
 tool
 extends State
 
+export (float) var coyote_time = .1
 
 var origin_state
 
 # FUNCTIONS AVAILABLE TO INHERIT
 
 func _on_enter(from) -> void:
-	var _t = add_timer("CoyoteTime", target.coyote_time)
+	var _t = add_timer("CoyoteTime", coyote_time)
 	origin_state = from
 
 
 func _on_update(_delta) -> void:
 	if Input.is_action_just_pressed("jump"):
 		if origin_state == "OnGround":
-			var _st = change_state("Jump")
+			var _st = change_state("GroundJump")
 		elif origin_state == "OnWall":
-			var _st = change_state("WallJump", true)
+			var _st = change_state("WallJump")
 
 			
 func _on_exit(_args):

@@ -12,54 +12,113 @@ anchor_bottom = 1.0
 
 [node name="StateRoot" type="Node" parent="."]
 script = ExtResource( 1 )
-debug_mode = true
-fsm_owner = NodePath("../Panel/VBoxContainer/HBCActiveStates/ActiveStates")
-history_size = 6
+history_size = 0
+fsm_owner = NodePath("")
+animation_player = NodePath("")
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="State1" type="Node" parent="StateRoot"]
 script = ExtResource( 5 )
-fsm_owner = NodePath("../../Panel/VBoxContainer/HBCHistory/History")
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Substate1" type="Node" parent="StateRoot/State1"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Substate2" type="Node" parent="StateRoot/State1"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Substate3" type="Node" parent="StateRoot/State1"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="StateRegions" type="Node" parent="StateRoot"]
 script = ExtResource( 4 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Region1" type="Node" parent="StateRoot/StateRegions"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Region2" type="Node" parent="StateRoot/StateRegions"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Region3" type="Node" parent="StateRoot/StateRegions"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="StateLoop" type="Node" parent="StateRoot"]
 script = ExtResource( 3 )
-fsm_owner = NodePath("../../Panel/VBoxContainer/HBCLoopButtons")
 exit_state = NodePath("../State1/Substate3")
+exit_state = NodePath("../State1/Substate3")
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Loop1" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Loop2" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Loop3" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Loop4" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Loop5" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
+disabled = false
+debug_mode = false
+anim_on_enter = 0
+next_state = NodePath("")
 
 [node name="Panel" type="Panel" parent="."]
 anchor_right = 1.0

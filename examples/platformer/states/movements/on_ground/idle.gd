@@ -1,5 +1,5 @@
 tool
-extends State
+extends StateRand
 
 
 # FUNCTIONS TO INHERIT #
@@ -10,9 +10,15 @@ extends State
 
 
 func _on_update(_delta):
-	if abs(target.velocity.x) > target.walk_margin:
-		var _s = change_state("Walk")
+	if Input.is_action_just_pressed("crouch"):
+		var _s = change_state("Crouch")	
 
 
-func _on_land_finished():
-	var _s = change_state()
+func _after_update(_delta):
+	if target.dir == 0:
+		target.velocity.x = 0
+
+
+# func _on_land_finished():
+# 	print("here")
+# 	var _s = change_state()

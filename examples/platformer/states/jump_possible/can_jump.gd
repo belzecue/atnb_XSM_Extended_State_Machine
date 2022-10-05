@@ -2,6 +2,8 @@ tool
 extends State
 
 
+export var prejump_time = 0.4
+
 # FUNCTIONS AVAILABLE TO INHERIT
 func _on_enter(_args) -> void:
 	if has_timer("PreJump"):
@@ -21,4 +23,4 @@ func choose_jump():
 
 
 func _on_CanPreJump_pre_jumped():
-	var _t = add_timer("PreJump", target.prejump_time)
+	var _t = add_timer("PreJump", prejump_time)

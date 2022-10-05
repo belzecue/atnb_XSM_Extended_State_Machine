@@ -2,24 +2,40 @@ tool
 extends State
 
 
+export (int) var ground_speed = 450
+export (int) var acceleration = 6
+export (int) var walk_margin = 20
+export (int) var run_margin = 350
+
+
 # FUNCTIONS TO INHERIT #
 func _on_enter(_args) -> void:
-	var _st = change_state("CanJump")
-
+	var _st1 = change_state("CanDash")
+	var _st2 = change_state("CanJump")
+	
 
 func _on_update(delta):
-	if target.dir != 0:
-		target.velocity.x = lerp(target.velocity.x,
-				target.ground_speed * target.dir,
-				target.acceleration * delta)
-	else:
-		target.velocity.x = lerp(target.velocity.x, 0, target.ground_friction * delta)
-		if abs(target.velocity.x) < target.walk_margin: target.velocity.x = 0
+	if target.dir == 0:
+		# Check if player in on the edge to stop the movement
+		var result = target.ray( sign(target.velocity.x), target.BOTTOM, 1.5)
+		if result.empty():
+			var _st = change_state("OnEdge")
+		elif abs(target.velocity.x) < walk_margin:
+			if not is_active("Crouch") and not is_active("Land"):
+				var _st = change_state("Idle")
+		else:
+			var _st = change_state("Brake")
 
-	if Input.is_action_just_pressed("jump"):
-		var _s = change_state("Jump")
-	elif !target.is_on_floor():
-		get_node("../InAir/Fall").add_timer("CoyoteTime", target.coyote_time)
-		var _s = change_state("Fall")
-	elif abs(target.velocity.x) < target.walk_margin && Input.is_action_just_pressed("crouch"):
-		var _s = change_state("Crouch")
+	else:
+		if abs(target.velocity.x) >= run_margin:
+			var _st = change_state("Run")
+		else:
+			var _s = change_state("Walk")
+	
+		target.velocity.x = lerp(target.velocity.x,
+				ground_speed * target.dir,
+				acceleration * delta)
+
+	if not target.is_on_floor():
+		var _s1 = change_state("CoyoteTime", "OnGround")
+		var _s2 = change_state("Fall")

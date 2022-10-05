@@ -13,11 +13,11 @@ func _on_exit(_args) -> void:
 
 
 func _on_LoopPrev_pressed():
-	prev()
+	prev_in_loop()
 
 
 func _on_LoopNext_pressed():
-	next()
+	next_in_loop()
 
 
 func _on_LoopExit_pressed():

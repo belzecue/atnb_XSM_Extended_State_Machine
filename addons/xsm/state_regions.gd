@@ -15,7 +15,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 tool
-class_name StateRegions
+class_name StateRegions, "res://addons/xsm/state_regions.png"
 extends State
 
 # StateRegions has all its children active or inactive at the same time
@@ -39,8 +39,8 @@ func init_children_states(root_state: State, first_branch: bool) -> void:
 			c.state_root = root_state
 			if c.target == null:
 				c.target = root_state.target
-			if c.anim_player == null:
-				c.anim_player = root_state.anim_player
+			if c.animation_player == null:
+				c.animation_player = root_state.animation_player
 			if first_branch:
 				c.status = ACTIVE
 				c.enter()

@@ -207,6 +207,8 @@ To flaticon.com and whoever made the icons used :
   https://www.flaticon.com/free-icon-font/chart-network_5528059
   https://www.flaticon.com/free-icon-font/chart-tree_5528048
   https://www.flaticon.com/free-icon-font/chart-connected_5528111
+  https://www.flaticon.com/free-icon-font/chart-set-theory_5528101
+  https://www.flaticon.com/free-icon/question_2669746
   ```
 
 To piratesephiroth and MadFlyFish for a C# port : https://github.com/MadFlyFish/XSM-Csharp

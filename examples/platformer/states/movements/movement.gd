@@ -2,6 +2,8 @@ tool
 extends State
 
 
+export (int) var gravity = 2500
+
 # FUNCTIONS TO INHERIT #
 
 func _on_update(delta):
@@ -12,13 +14,13 @@ func _on_update(delta):
 	elif Input.is_action_pressed("right"):
 		target.dir = 1
 
-	target.velocity.y += delta * target.gravity
+	target.velocity.y += delta * gravity
 
 
 func _after_update(_delta):
 	target.velocity = target.move_and_slide(target.velocity, Vector2.UP)
 
 	if target.velocity.x > 0:
-		target.get_node("Skin").flip_h = false
+		target.skin.scale.x = 1
 	elif target.velocity.x < 0:
-		target.get_node("Skin").flip_h = true
+		target.skin.scale.x = -1

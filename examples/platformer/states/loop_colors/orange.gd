@@ -4,7 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func _on_enter(_args):
-	target.modulate = Color.orange
+	target.get_node("Skin").modulate = Color.orange
 
 
 func who_was_i():

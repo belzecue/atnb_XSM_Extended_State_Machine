@@ -4,7 +4,7 @@ extends State
 
 # FUNCTIONS TO INHERIT #
 func _on_enter(_args):
-	target.modulate = Color.purple
+	target.get_node("Skin").modulate = Color.white
 
 
 # Test of get_active_substate(), see in parent's script "RegionColor"
