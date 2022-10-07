@@ -8,10 +8,22 @@ export (int) var air_friction = 10
 
 
 # FUNCTIONS TO INHERIT #
-func _on_update(delta):
+func _on_enter(_args):
 	if target.is_on_floor():
 		var _s = change_state("OnGround")
-		return
+
+
+func _on_update(delta):
+
+	if target.dir != 0:
+		target.velocity.x = lerp(target.velocity.x, air_speed * target.dir, air_accel * delta)
+	else:
+		target.velocity.x = lerp(target.velocity.x,  0, air_friction * delta)
+
+	target.skin.rotation = - target.velocity.angle_to(Vector2.UP)
+
+	if target.is_on_floor():
+		var _s = change_state("OnGround")
 	elif target.is_on_wall():
 		target.detect_wall_dir()
 
@@ -22,15 +34,6 @@ func _on_update(delta):
 			var _s = change_state("CornerHop")
 		else:
 			var _s = change_state("OnWall")
-
-		return
-
-	if target.dir != 0:
-		target.velocity.x = lerp(target.velocity.x, air_speed * target.dir, air_accel * delta)
-	else:
-		target.velocity.x = lerp(target.velocity.x,  0, air_friction * delta)
-
-	target.skin.rotation = - target.velocity.angle_to(Vector2.UP)
 
 
 func _on_exit(_args) -> void:

@@ -89,20 +89,13 @@ var disabled := false setget set_disabled
 # Is exported in "_get_property_list():"
 var debug_mode := false
 # Is exported in "_get_property_list():"
-enum {ANIM_ENTER_NONE, ANIM_ENTER_STATE, ANIM_ENTER_CHOSE}
-var anim_on_enter := 0 setget set_anim_on_enter
-var anim_name := ""
-enum {ANIM_FINISHED_NOTHING, ANIM_FINISHED_PARENT, ANIM_FINISHED_SELF}
-var on_anim_finished := 0
-# Is exported in "_get_property_list():"
 var next_state: NodePath
 # Has been moved to create a StateRegions Node
 # export var has_regions := false
 
 # Is exported in "_get_property_list():" for root only
 var fsm_owner: NodePath
-# Is exported in "_get_property_list():" for root only
-var animation_player: NodePath
+
 
 # VARS
 #
@@ -148,23 +141,25 @@ func _ready() -> void:
 		if prev_node.get_class() == "State" and prev_node.next_state.is_empty():
 			prev_node.next_state = "../%s" % name
 
-	if Engine.is_editor_hint():
-		return
+	# First of all, define state root
+	var ancester = self
+	while not ancester.is_root():
+		ancester = ancester.get_parent()
+	state_root = ancester
 
-	set_anim_on_enter(anim_on_enter)
+	if not Engine.is_editor_hint():
+		if not fsm_owner.is_empty():
+			target = get_node_or_null(fsm_owner)
 
-	if not fsm_owner.is_empty():
-		target = get_node_or_null(fsm_owner)
-
-	# all the root init logic here 
-	if is_root():
-		if fsm_owner.is_empty() and get_parent() != null:
-			target = get_parent()
-		state_map[name] = self
-		init_children_state_map(state_map, self)
-		enter()
-		init_children_states(self, true)
-		_after_enter(null)
+		# all the root init logic here 
+		if is_root():
+			if fsm_owner.is_empty() and get_parent():
+				target = get_parent()
+			state_map[name] = self
+			init_children_state_map(state_map, self)
+			enter()
+			init_children_states(true)
+			_after_enter(null)
 
 
 func _exit_tree() -> void:
@@ -182,15 +177,6 @@ func _get_configuration_warning() -> String:
 	return ""
 
 
-func set_anim_on_enter(value):
-	anim_on_enter = value
-	if anim_on_enter == ANIM_ENTER_NONE:
-		anim_name = ""
-	elif anim_on_enter == ANIM_ENTER_STATE:
-		anim_name = name
-	property_list_changed_notify()
-
-
 # We want to add some export variables in their categories
 # And separate those of the root state
 func _get_property_list():
@@ -199,7 +185,7 @@ func _get_property_list():
 	if is_root():
 		# Adds a root category in the inspector
 		properties.append({
-			name = "StateRoot",
+			name = "XSM Root",
 			type = TYPE_NIL,
 			usage = PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SCRIPT_VARIABLE
 		})
@@ -211,10 +197,6 @@ func _get_property_list():
 		})
 		properties.append({
 			name = "fsm_owner",
-			type = TYPE_NODE_PATH
-		})
-		properties.append({
-			name = "animation_player",
 			type = TYPE_NODE_PATH
 		})
 
@@ -233,24 +215,6 @@ func _get_property_list():
 		type = TYPE_BOOL
 	})
 
-	properties.append({
-		name = "anim_on_enter",
-		type = TYPE_INT,
-		hint = PROPERTY_HINT_ENUM, 
-		"hint_string": "None:0, State's name:1, Chose anim:2"
-	})
-	if anim_on_enter == ANIM_ENTER_CHOSE:
-		properties.append({
-			name = "anim_name",
-			type = TYPE_STRING
-		})
-	if anim_on_enter != ANIM_ENTER_NONE:
-		properties.append({
-			name = "on_anim_finished",
-			type = TYPE_INT,
-			hint = PROPERTY_HINT_ENUM, 
-			"hint_string": "Do Nothing:0, Parent's choice:1, Next from Self:2"
-		})
 	properties.append({
 		name = "next_state",
 		type = TYPE_NODE_PATH
@@ -272,6 +236,7 @@ func _default_next_state() -> NodePath:
 		return NodePath()
 	return NodePath("../%s" % get_parent().get_child(get_position_in_parent() + 1).name)
 
+
 func property_get_revert(property):
 	if property == "history_size":
 		return 5
@@ -285,12 +250,6 @@ func set_disabled(new_disabled: bool) -> void:
 		emit_signal("disabled")
 	else:
 		emit_signal("enabled")
-	# set_disabled_children(new_disabled)
-
-
-# func set_disabled_children(new_disabled: bool):
-# 	for c in get_children():
-# 		c.set_disabled(new_disabled)
 
 
 # Careful, if your substates have the same name,
@@ -314,6 +273,22 @@ func init_children_state_map(dict: Dictionary, new_state_root: State):
 		c.init_children_state_map(dict, state_root)
 
 
+func init_children_states(first_branch: bool) -> void:
+	for c in get_children():
+		if c.get_class() == "State":
+			c.status = INACTIVE
+			if c.target == null or c.target.is_empty():
+				c.target = state_root.target
+			if first_branch and c == get_child(0):
+				c.status = ACTIVE
+				c.enter()
+				c.last_state = state_root
+				c.init_children_states(true)
+				c._after_enter(null)
+			else:
+				c.init_children_states(false)
+
+
 #
 # SETTERS AND GETTERS
 # Those make sure that any access to those variables return the root one
@@ -321,31 +296,31 @@ func init_children_state_map(dict: Dictionary, new_state_root: State):
 # This is solved in Godot 4 !!! (hurray)
 #
 func get_pending_states():
-	if is_root():
+	if is_root() or not state_root:
 		return pending_states
 	return state_root.pending_states
 
 
 func get_state_map():
-	if is_root():
+	if is_root() or not state_root:
 		return state_map
 	return state_root.state_map
 
 
 func get_duplicate_names():
-	if is_root():
+	if is_root() or not state_root:
 		return duplicate_names
 	return state_root.duplicate_names
 
 
 func get_active_states():
-	if is_root():
+	if is_root() or not state_root:
 		return active_states
 	return state_root.active_states
 
 
 func get_active_states_history():
-	if is_root():
+	if is_root() or not state_root:
 		return active_states_history
 	return state_root.active_states_history
 
@@ -401,29 +376,34 @@ func _on_timeout(_name: String) -> void:
 # FUNCTIONS TO CALL IN INHERITED STATES
 #
 func change_state_to(new_state_node: State = null, args_on_enter = null, args_after_enter = null,
-		args_before_exit = null, args_on_exit = null) -> State:
+		args_before_exit = null, args_on_exit = null, force: bool = false) -> State:
 	return change_state_node(new_state_node, args_on_enter, args_after_enter,
-			args_before_exit, args_on_exit)
+			args_before_exit, args_on_exit, force)
 
 
 func change_state_node(new_state_node: State = null, args_on_enter = null, args_after_enter = null,
-		args_before_exit = null, args_on_exit = null) -> State:
+		args_before_exit = null, args_on_exit = null, force: bool = false) -> State:
+
+	if force:
+		if is_debugged():
+			prints("[FORCE]", new_state_node.get_name())
 
 	if new_state_node == null:
 		new_state_node = self
+
 	if new_state_node.is_disabled():
 		return null
 	if new_state_node.status != INACTIVE:
-		return null
+		if not force:
+			return null
 
 	if not state_root.state_in_update:
 		# debug info
 		if is_debugged():
-			print("[!!!] %s pending state : '%s' -> '%s'" 
-					% [target.name, get_name(), new_state_node.get_name()])
+			print("[!!!] %s pending state : '%s' -> '%s'" % [target.name, get_name(), new_state_node.get_name()])
 		# can't process, add to pending states
 		state_root.new_pending_state(new_state_node, args_on_enter, args_after_enter,
-				args_before_exit, args_on_exit)
+				args_before_exit, args_on_exit, force)
 		return null
 
 	# Should avoid infinite loops of state changes
@@ -439,7 +419,8 @@ func change_state_node(new_state_node: State = null, args_on_enter = null, args_
 		state_root.changing_state_level += 1
 
 	# get the closest active parent
-	var active_root: State = get_active_root(new_state_node)
+	# if force, then returns its parent
+	var active_root: State = get_active_root(new_state_node, force)
 
 	# change the children status to EXITING
 	active_root.change_children_status_to_exiting()
@@ -505,6 +486,12 @@ func change_state_if(new_state: String, if_state: String) -> State:
 	return null
 
 
+func change_state_force(new_state_node: State = null, args_on_enter = null, args_after_enter = null,
+		args_before_exit = null, args_on_exit = null) -> State:
+	return change_state_node(new_state_node, args_on_enter, args_after_enter,
+			args_before_exit, args_on_exit, true)
+
+
 func has_parent(state_node: State) -> bool:
 	var parent = get_parent()
 	if parent == state_node:
@@ -548,71 +535,6 @@ func was_state_active(state_name: String, history_id: int = 0) -> bool:
 	return get_previous_active_states(history_id).has(state_name)
 
 
-func play(anim: String, custom_speed: float = 1.0, from_end: bool = false) -> void:
-	if disabled or status != ACTIVE:
-		return
-	var anim_player = get_node_or_null(animation_player)
-	if anim_player and anim_player.has_animation(anim):
-		if anim_player.current_animation != anim:
-			anim_player.stop()
-			anim_player.play(anim)
-			# The goal here is to provide a way to change state automatically at the end of an animation
-			if anim_player.is_connected("animation_finished", self, "_on_animation_finished"):
-				anim_player.disconnect("animation_finished", self, "_on_animation_finished")
-			anim_player.connect("animation_finished", self, "_on_animation_finished", [anim])
-
-
-func play_backwards(anim: String) -> void:
-	play(anim, -1.0, true)
-
-
-func play_blend(anim: String, custom_blend: float, custom_speed: float = 1.0,
-		from_end: bool = false) -> void:
-	var anim_player = get_node_or_null(animation_player)
-	if status == ACTIVE and anim_player != null and anim_player.has_animation(anim):
-		if anim_player.current_animation != anim:
-			anim_player.play(anim, custom_blend, custom_speed, from_end)
-
-
-func play_sync(anim: String, custom_speed: float = 1.0,
-		from_end: bool = false) -> void:
-	var anim_player = get_node_or_null(animation_player)
-	if status == ACTIVE and anim_player != null and anim_player.has_animation(anim):
-		var curr_anim: String = anim_player.current_animation
-		if curr_anim != anim and curr_anim != "":
-			var curr_anim_pos: float = anim_player.current_animation_position
-			var curr_anim_length: float = anim_player.current_animation_length
-			var ratio: float = curr_anim_pos / curr_anim_length
-			play(anim, custom_speed, from_end)
-			anim_player.seek(ratio * anim_player.current_animation_length)
-		else:
-			play(anim, custom_speed, from_end)
-
-
-func pause() -> void:
-	stop(false)
-
-
-func queue(anim: String) -> void:
-	var anim_player = get_node_or_null(animation_player)
-	if status == ACTIVE and anim_player != null and anim_player.has_animation(anim):
-		anim_player.queue(anim)
-
-
-func stop(reset: bool = true) -> void:
-	var anim_player = get_node_or_null(animation_player)
-	if status == ACTIVE and anim_player != null:
-		anim_player.stop(reset)
-		state_root.current_anim_priority = 0
-
-
-func is_playing(anim: String) -> bool:
-	var anim_player = get_node_or_null(animation_player)
-	if anim_player != null:
-		return anim_player.current_animation == anim
-	return false
-
-
 func add_timer(name: String, time: float) -> Timer:
 	del_timer(name)
 	var timer := Timer.new()
@@ -642,28 +564,10 @@ func del_timers() -> void:
 func has_timer(name: String) -> bool:
 	return has_node(name)
 
+
 #
 # PRIVATE FUNCTIONS
 #
-func init_children_states(root_state: State, first_branch: bool) -> void:
-	for c in get_children():
-		if c.get_class() == "State":
-			c.status = INACTIVE
-			c.state_root = root_state
-			if c.target == null or c.target.is_empty():
-				c.target = root_state.target
-			if c.animation_player == null or c.animation_player.is_empty():
-				# c.anim_player = root_state.anim_player
-				c.animation_player = root_state.get_node(root_state.animation_player).get_path()
-			if first_branch and c == get_child(0):
-				c.status = ACTIVE
-				c.enter()
-				c.last_state = root_state
-				c.init_children_states(root_state, true)
-				c._after_enter(null)
-			else:
-				c.init_children_states(root_state, false)
-
 
 # update the root active states history each frame
 func add_to_active_states_history(new_active_states: Dictionary) -> void:
@@ -680,10 +584,6 @@ func remove_active_state(state_to_erase: State) -> void:
 		var parent_name: String = state_to_erase.get_parent().name
 		name_in_state_map = str("%s/%s" % [parent_name, state_name])
 	state_root.active_states.erase(name_in_state_map)
-	# var ancester = self
-	# while ancester.get_class() == "State":
-	# 	ancester.active_states.erase(name_in_state_map)
-	# 	ancester = ancester.get_parent()
 	emit_signal("active_state_list_changed", state_root.active_states)
 
 
@@ -695,10 +595,6 @@ func add_active_state(state_to_add: State) -> void:
 		var parent_name: String = state_to_add.get_parent().name
 		name_in_state_map = str("%s/%s" % [parent_name, state_name])
 	state_root.active_states[name_in_state_map] = state_to_add
-	# var ancester = self
-	# while ancester.get_class() == "State":
-	# 	ancester.active_states[name_in_state_map] = state_to_add
-	# 	ancester = ancester.get_parent()
 	emit_signal("active_state_list_changed", state_root.active_states)
 
 
@@ -719,9 +615,11 @@ func find_state_node_or_self(new_state: String) -> State:
 	return null
 
 
-func get_active_root(new_state_node: State) -> State:
+func get_active_root(new_state_node: State, return_parent: bool = false) -> State:
 	var result: State = new_state_node
 	while not result.status == ACTIVE and not result.is_root():
+		result = result.get_parent()
+	if return_parent and not result.is_root():
 		result = result.get_parent()
 	return result
 
@@ -745,7 +643,9 @@ func update_active_states(_delta: float) -> void:
 			var arg2 = new_state_with_args[2]
 			var arg3 = new_state_with_args[3]
 			var arg4 = new_state_with_args[4]
-			var new_state: State = change_state_node(new_state_node, arg1, arg2, arg3, arg4)
+			var arg_force = new_state_with_args[5]
+			# Added the force parameter here to be able to change to an active state
+			var new_state: State = change_state_node(new_state_node, arg1, arg2, arg3, arg4, arg_force)
 			emit_signal("pending_state_changed", new_state)
 	update(_delta)
 	for c in get_children():
@@ -766,9 +666,6 @@ func change_children_status_to_exiting() -> void:
 func exit(args = null) -> void:
 	del_timers()
 	_on_exit(args)
-	var anim_player = get_node(animation_player)
-	if anim_player and anim_player.is_connected("animation_finished", self, "_on_animation_finished"):
-		anim_player.disconnect("animation_finished", self, "_on_animation_finished")
 	status = INACTIVE
 	remove_active_state(self)
 	emit_signal("state_exited", self)
@@ -804,8 +701,6 @@ func change_children_status_to_entering(new_state_path: NodePath) -> void:
 func enter(args = null) -> void:
 	status = ACTIVE
 	add_active_state(self)
-	if anim_name != "":
-		play(anim_name)
 	_on_enter(args)
 	emit_signal("state_entered", self)
 	if not is_root():
@@ -833,13 +728,14 @@ func reset_children_status():
 # Careful, this is only for the root !!!
 func new_pending_state(new_state_node: State, args_on_enter = null,
 		args_after_enter = null, args_before_exit = null,
-		args_on_exit = null) -> void:
+		args_on_exit = null, force := false) -> void:
 	var new_state_array := []
 	new_state_array.append(new_state_node)
 	new_state_array.append(args_on_enter)
 	new_state_array.append(args_after_enter)
 	new_state_array.append(args_before_exit)
 	new_state_array.append(args_on_exit)
+	new_state_array.append(force)
 	# pending to state_root
 	state_root.pending_states.append(new_state_array)
 	emit_signal("pending_state_added", new_state_node)
@@ -848,16 +744,6 @@ func new_pending_state(new_state_node: State, args_on_enter = null,
 func _on_timer_timeout(timer_name: String) -> void:
 	del_timer(timer_name)
 	_on_timeout(timer_name)
-
-
-func _on_animation_finished(finished_animation, wtf):
-	match on_anim_finished:
-		ANIM_FINISHED_PARENT:
-			if get_parent().get_class() == "State":
-				print("parnt here !!!")
-				get_parent().change_to_next_substate()
-		ANIM_FINISHED_SELF:
-			change_to_next()
 
 
 func reset_done_this_frame(new_done: bool) -> void:

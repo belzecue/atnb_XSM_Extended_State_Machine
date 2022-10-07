@@ -13,6 +13,10 @@ func _on_enter(_args) -> void:
 	var _st1 = change_state("CanDash")
 	var _st2 = change_state("CanJump")
 	
+	if not target.is_on_floor():
+		var _s1 = change_state("CoyoteTime", "OnGround")
+		var _s2 = change_state("Fall")
+
 
 func _on_update(delta):
 	if target.dir == 0:
@@ -22,7 +26,7 @@ func _on_update(delta):
 			var _st = change_state("OnEdge")
 		elif abs(target.velocity.x) < walk_margin:
 			if not is_active("Crouch") and not is_active("Land"):
-				var _st = change_state("Idle")
+				var _st = change_state("IdleRand")
 		else:
 			var _st = change_state("Brake")
 

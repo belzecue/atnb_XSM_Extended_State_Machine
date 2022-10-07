@@ -95,8 +95,13 @@ func _get_property_list():
 # PUBLIC FUNCTIONS
 #
 func change_to_next_substate():
-	print("rand change")
-	pass
+	var rand_array = []
+	for c in priorities.keys():
+		for i in priorities[c]:
+			rand_array.append(c)
+	var rand_idx = randi() % rand_array.size()
+	print(rand_idx)
+	var _st =  change_state_force(get_node_or_null(rand_array[rand_idx]))
 
 
 #

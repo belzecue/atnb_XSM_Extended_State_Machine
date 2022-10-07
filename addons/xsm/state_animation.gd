@@ -21,11 +21,13 @@ extends State
 # EXPORTS
 #
 # Is exported in "_get_property_list():"
-enum {ANIM_ENTER_NONE, ANIM_ENTER_STATE, ANIM_ENTER_CHOSE}
-var anim_on_enter := 0 setget set_anim_on_enter
-var anim_name := ""
-enum {ANIM_FINISHED_NOTHING, ANIM_FINISHED_PARENT, ANIM_FINISHED_SELF}
-var on_anim_finished := 0
+var anim_on_enter := "" setget set_anim_on_enter
+var anim_times_to_play := 1
+var anim_times_played := 0
+enum {ANIM_FINISHED_CALLBACK, ANIM_FINISHED_LOOP, ANIM_FINISHED_CHAIN, ANIM_FINISHED_PARENT, ANIM_FINISHED_SELF}
+var on_anim_finished := 0 setget set_on_anim_finished
+var chained_anim := ""
+var chained := false
 
 # Is exported in "_get_property_list():" for root only
 var animation_player: NodePath
@@ -35,9 +37,12 @@ var animation_player: NodePath
 #
 func _ready() -> void:
 	if Engine.is_editor_hint():
-		return
+		var _conn = connect("renamed", self, "_on_StateAnimation_renamed")
+	
 	set_anim_on_enter(anim_on_enter)
-
+	if animation_player.is_empty():
+		animation_player = guess_animation_player()
+	
 
 func _get_configuration_warning() -> String:
 	return ""
@@ -45,10 +50,11 @@ func _get_configuration_warning() -> String:
 
 func set_anim_on_enter(value):
 	anim_on_enter = value
-	if anim_on_enter == ANIM_ENTER_NONE:
-		anim_name = ""
-	elif anim_on_enter == ANIM_ENTER_STATE:
-		anim_name = name
+	property_list_changed_notify()
+
+
+func set_on_anim_finished(value):
+	on_anim_finished = value
 	property_list_changed_notify()
 
 
@@ -57,6 +63,15 @@ func set_anim_on_enter(value):
 func _get_property_list():
 	var properties = []
 
+	# Will guess the AnimationPlayer each time
+	# the inspector loads for this Node
+	if animation_player.is_empty():
+		animation_player = guess_animation_player()
+
+	# Will guess the animation to play
+	var ap = get_node(animation_player)
+	if ap and ap.has_animation(name) and anim_on_enter == "":
+		anim_on_enter = name
 
 	# Adds a State category in the inspector
 	properties.append({
@@ -66,44 +81,67 @@ func _get_property_list():
 	})
 
 	properties.append({
-		name = "anim_on_enter",
-		type = TYPE_INT,
-		hint = PROPERTY_HINT_ENUM, 
-		"hint_string": "None:0, State's name:1, Chose anim:2"
+		name = "animation_player",
+		type = TYPE_NODE_PATH
 	})
-	if anim_on_enter == ANIM_ENTER_CHOSE:
+
+	var anims_hint = "NONE"
+	for anim in get_node(animation_player).get_animation_list():
+		anims_hint = "%s,%s" % [anims_hint, anim]
+	properties.append({
+		name = "anim_on_enter",
+		type = TYPE_STRING,
+		hint = PROPERTY_HINT_ENUM, 
+		"hint_string": anims_hint
+	})
+
+	if anim_on_enter != "NONE" and anim_on_enter != "": #ANIM_ENTER_NONE:
 		properties.append({
-			name = "anim_name",
-			type = TYPE_STRING
+			name = "anim_times_to_play",
+			type = TYPE_INT,
+			hint =  PROPERTY_HINT_RANGE,
+			"hint_string": "1,10,or_greater"
 		})
-	if anim_on_enter != ANIM_ENTER_NONE:
 		properties.append({
 			name = "on_anim_finished",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_ENUM, 
-			"hint_string": "Do Nothing:0, Parent's choice:1, Next from Self:2"
+			"hint_string": "Callback Only:0, Loop Anim:1, Chained Anim:2, Parent's choice:3, Next from Self:4"
+		})
+	if on_anim_finished == ANIM_FINISHED_CHAIN:
+		properties.append({
+			name = "chained_anim",
+			type = TYPE_STRING,
+			hint = PROPERTY_HINT_ENUM,
+			"hint_string": anims_hint
 		})
 
 	return properties
 
 
+func property_can_revert(property):
+	if property == "animation_player":
+		return true
+	if property == "anim_times_to_play":
+		return true
+	if property == "on_anim_finished":
+		return ANIM_FINISHED_CALLBACK
+	return .property_can_revert(property)
 
-#
-# SETTERS AND GETTERS
-# Those make sure that any access to those variables return the root one
-# Does not work in an inherited class ???
-# This is solved in Godot 4 !!! (hurray)
-#
 
-#
-# PROCESS - Use update() to add state logic
-#
+func property_get_revert(property):
+	if property == "animation_player":
+		return guess_animation_player()
+	if property == "anim_times_to_play":
+		return 1
+	return .property_get_revert(property)
+
 
 
 #
 # FUNCTIONS TO INHERIT
 #
-func _on_finished(_name: String) -> void:
+func _on_anim_finished(_name: String) -> void:
 	pass
 
 
@@ -115,13 +153,13 @@ func play(anim: String, custom_speed: float = 1.0, from_end: bool = false) -> vo
 		return
 	var anim_player = get_node_or_null(animation_player)
 	if anim_player and anim_player.has_animation(anim):
-		if anim_player.current_animation != anim:
-			anim_player.stop()
+		if not anim_player.is_playing() or anim_player.current_animation != anim:
+			# anim_player.stop()
 			anim_player.play(anim)
 			# The goal here is to provide a way to change state automatically at the end of an animation
-			if anim_player.is_connected("animation_finished", self, "_on_animation_finished"):
-				anim_player.disconnect("animation_finished", self, "_on_animation_finished")
-			anim_player.connect("animation_finished", self, "_on_animation_finished", [anim])
+			if anim_player.is_connected("animation_finished", self, "_on_AnimationPlayer_animation_finished"):
+				anim_player.disconnect("animation_finished", self, "_on_AnimationPlayer_animation_finished")
+			anim_player.connect("animation_finished", self, "_on_AnimationPlayer_animation_finished")
 
 
 func play_backwards(anim: String) -> void:
@@ -178,40 +216,56 @@ func is_playing(anim: String) -> bool:
 #
 # PRIVATE FUNCTIONS
 #
+func guess_animation_player() -> NodePath:
+	for c in state_root.get_parent().get_children():
+		if c is AnimationPlayer:
+			return get_path_to(c)
+	return NodePath()
+
 
 func exit(args = null) -> void:
-	del_timers()
-	_on_exit(args)
-	var anim_player = get_node(animation_player)
-	if anim_player and anim_player.is_connected("animation_finished", self, "_on_animation_finished"):
-		anim_player.disconnect("animation_finished", self, "_on_animation_finished")
-	status = INACTIVE
-	remove_active_state(self)
-	emit_signal("state_exited", self)
-	if not is_root():
-		get_parent().emit_signal("substate_exited", self)
+	chained = false
+	anim_times_played = 0
+	var anim_player = get_node_or_null(animation_player)
+	if anim_player and anim_player.is_connected("animation_finished", self, "_on_AnimationPlayer_animation_finished"):
+		anim_player.disconnect("animation_finished", self, "_on_AnimationPlayer_animation_finished")
 
+	.exit(args)
+		
 
 func enter(args = null) -> void:
-	status = ACTIVE
-	add_active_state(self)
-	if anim_name != "":
-		play(anim_name)
-	_on_enter(args)
-	emit_signal("state_entered", self)
-	if not is_root():
-		get_parent().emit_signal("substate_entered", self)
+	.enter(args)
+
+	if anim_on_enter != "" and anim_on_enter != "NONE":
+		play(anim_on_enter)
 
 
-func _on_animation_finished(finished_animation, wtf):
-	match on_anim_finished:
-		ANIM_FINISHED_NOTHING:
-			_on_finished(finished_animation)
-		ANIM_FINISHED_PARENT:
-			if get_parent().get_class() == "State":
-				print("parnt here !!!")
-				get_parent().change_to_next_substate()
-		ANIM_FINISHED_SELF:
-			change_to_next()
-				
+func _on_AnimationPlayer_animation_finished(finished_animation):
+	if chained:
+		play(chained_anim)
+	elif finished_animation == anim_on_enter:	
+		anim_times_played += 1
+		if anim_times_played >= anim_times_to_play:
+			_on_anim_finished(finished_animation)
+			match on_anim_finished:
+				ANIM_FINISHED_LOOP:
+					play(finished_animation)
+				ANIM_FINISHED_CHAIN:
+					if chained_anim != "" and chained_anim != "NONE":
+						play(chained_anim)
+						chained = true
+				ANIM_FINISHED_PARENT:
+					if get_parent().get_class() == "State":
+						get_parent().change_to_next_substate()
+				ANIM_FINISHED_SELF:
+					change_to_next()
+			anim_times_played = 0
+		else:
+			play(finished_animation)
 
+
+func _on_StateAnimation_renamed():
+	# Will guess the animation to play
+	var ap = get_node(animation_player)
+	if ap and ap.has_animation(name) and anim_on_enter == "":
+		anim_on_enter = name

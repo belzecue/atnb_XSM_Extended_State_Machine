@@ -1,5 +1,5 @@
 tool
-extends State
+extends StateAnimation
 
 
 var tween
@@ -23,6 +23,11 @@ func _on_enter(_args) -> void:
 
 func jump():
 	target.velocity.y = - ground_jump_speed
+
+	var anim_player = get_node_or_null(animation_player)
+	if anim_player and anim_player.current_animation_position >= 0.1:
+		target.skin.rotation = - target.velocity.angle_to(Vector2.UP)
+		target.skin.position = Vector2()
 
 
 func _on_exit(_args) -> void:

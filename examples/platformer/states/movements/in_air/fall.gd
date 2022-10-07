@@ -1,5 +1,5 @@
 tool
-extends State
+extends StateAnimation
 
 
 export (int) var air_top_margin = 50

@@ -1,5 +1,5 @@
 tool
-extends State
+extends StateAnimation
 
 
 export (int) var dash_speed = 1000
@@ -85,19 +85,19 @@ func _after_update(_delta) -> void:
 		else:
 			dash_direction.x = target.skin.scale.x
 
-	dash_current_length += last_frame_pos.distance_to(target.global_position)
-	if dash_current_length > 0 and last_frame_pos == target.global_position:
-		var _st = change_state("Fall")
-	last_frame_pos = target.global_position
-	if dash_current_length >= dash_distance - dash_speed * _delta:
-		# target.velocity.y += _delta * target.gravity
-		var _st = change_state("Fall")
-
 	target.velocity = dash_direction * dash_speed
 
 	target.get_node("DashParticles2D").rotation = - dash_direction.angle_to(Vector2.UP)
 	target.get_node("DashParticles2D").position = - dash_direction * 10
 	target.skin.rotation = - dash_direction.angle_to(Vector2.UP)
+
+	# Here, exits if the dash is blocked or if it is too long
+	dash_current_length += last_frame_pos.distance_to(target.global_position)
+	if dash_current_length > 0 and last_frame_pos == target.global_position:
+		var _st = change_state("Fall")
+	last_frame_pos = target.global_position
+	if dash_current_length >= dash_distance - dash_speed * _delta:
+		var _st = change_state("Fall")
 
 
 func _on_exit(_args) -> void:
@@ -105,6 +105,7 @@ func _on_exit(_args) -> void:
 		target.velocity = exit_air_speed * dash_direction
 	else:
 		target.velocity = exit_ground_speed * dash_direction
+		# move down by one pixel to the ground if it is just above it
 		var raysult = target.ray(target.skin.scale.x, target.BOTTOM, 2.0)
 		if not raysult.empty():
 			target.position.y += 1

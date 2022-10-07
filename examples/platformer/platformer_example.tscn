@@ -1,10 +1,9 @@
-[gd_scene load_steps=109 format=2]
+[gd_scene load_steps=105 format=2]
 
 [ext_resource path="res://examples/platformer/states/movements/on_ground/on_ground.gd" type="Script" id=1]
 [ext_resource path="res://examples/platformer/states/movements/on_ground/idle.gd" type="Script" id=2]
 [ext_resource path="res://addons/xsm/state.gd" type="Script" id=3]
 [ext_resource path="res://examples/platformer/states/movements/in_air/in_air.gd" type="Script" id=4]
-[ext_resource path="res://examples/platformer/states/loop_colors/colors.gd" type="Script" id=5]
 [ext_resource path="res://examples/platformer/states/movements/on_ground/run.gd" type="Script" id=6]
 [ext_resource path="res://examples/platformer/assets/tilemap.png" type="Texture" id=7]
 [ext_resource path="res://examples/platformer/player.gd" type="Script" id=8]
@@ -16,6 +15,7 @@
 [ext_resource path="res://examples/platformer/states/movements/on_ground/brake.gd" type="Script" id=14]
 [ext_resource path="res://examples/platformer/states/movements/movement.gd" type="Script" id=15]
 [ext_resource path="res://examples/platformer/states/movements/on_ground/land.gd" type="Script" id=16]
+[ext_resource path="res://addons/xsm/state_animation.gd" type="Script" id=17]
 [ext_resource path="res://examples/platformer/states/movements/in_air/fall.gd" type="Script" id=18]
 [ext_resource path="res://addons/xsm/state_regions.gd" type="Script" id=19]
 [ext_resource path="res://examples/platformer/states/jump_possible/coyote_time.gd" type="Script" id=20]
@@ -33,76 +33,9 @@
 [sub_resource type="RectangleShape2D" id=78]
 extents = Vector2( 6, 6 )
 
-[sub_resource type="Animation" id=2]
-resource_name = "Brake"
-length = 0.16
-loop = true
-step = 0.08
-tracks/0/type = "value"
-tracks/0/path = NodePath("Skin:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.08 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 1,
-"values": [ 27, 28 ]
-}
-
-[sub_resource type="Animation" id=83]
-resource_name = "ColorRed"
-length = 0.2
-tracks/0/type = "value"
-tracks/0/path = NodePath("Skin:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Color( 0.839216, 0.054902, 0.054902, 1 ) ]
-}
-
-[sub_resource type="Animation" id=82]
-resource_name = "ColorWhite"
-length = 0.2
-tracks/0/type = "value"
-tracks/0/path = NodePath("Skin:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 1 ) ]
-}
-
-[sub_resource type="Animation" id=84]
-resource_name = "ColorYellow"
-length = 0.2
-tracks/0/type = "value"
-tracks/0/path = NodePath("Skin:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Color( 0.839216, 0.752941, 0.054902, 1 ) ]
-}
-
 [sub_resource type="Animation" id=86]
-resource_name = "CornerHop"
+resource_name = "Ball"
 length = 0.02
-loop = true
 step = 0.03
 tracks/0/type = "value"
 tracks/0/path = NodePath("Skin:frame")
@@ -117,9 +50,25 @@ tracks/0/keys = {
 "values": [ 18 ]
 }
 
+[sub_resource type="Animation" id=2]
+resource_name = "Brake"
+length = 0.16
+step = 0.08
+tracks/0/type = "value"
+tracks/0/path = NodePath("Skin:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.08 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ 27, 28 ]
+}
+
 [sub_resource type="Animation" id=3]
 length = 0.02
-loop = true
 step = 0.02
 tracks/0/type = "value"
 tracks/0/path = NodePath("Skin:frame")
@@ -137,7 +86,6 @@ tracks/0/keys = {
 [sub_resource type="Animation" id=80]
 resource_name = "Dash"
 length = 0.2
-loop = true
 step = 0.05
 tracks/0/type = "value"
 tracks/0/path = NodePath("Skin:frame")
@@ -170,23 +118,6 @@ tracks/0/keys = {
 "values": [ 15, 16 ]
 }
 
-[sub_resource type="Animation" id=13]
-resource_name = "FallTop"
-length = 0.09
-step = 0.03
-tracks/0/type = "value"
-tracks/0/path = NodePath("Skin:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ 18 ]
-}
-
 [sub_resource type="Animation" id=7]
 length = 0.6
 step = 0.3
@@ -204,9 +135,9 @@ tracks/0/keys = {
 }
 
 [sub_resource type="Animation" id=87]
-resource_name = "Idle2"
-length = 1.2
-step = 0.2
+resource_name = "IdleSlow"
+length = 0.9
+step = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("Skin:frame")
 tracks/0/interp = 1
@@ -214,10 +145,27 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.2, 0.6 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
+"times": PoolRealArray( 0, 0.3, 0.6, 0.9 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 1,
-"values": [ 30, 31, 32 ]
+"values": [ 30, 31, 32, 1 ]
+}
+
+[sub_resource type="Animation" id=88]
+resource_name = "IdleSnore"
+length = 0.9
+step = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Skin:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3, 0.6, 0.9 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 30, 33, 34, 35 ]
 }
 
 [sub_resource type="Animation" id=8]
@@ -235,23 +183,9 @@ tracks/0/keys = {
 "update": 1,
 "values": [ 12, 13 ]
 }
-tracks/1/type = "method"
-tracks/1/path = NodePath("XSM/RegionMovement/Jumps")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0.15 ),
-"transitions": PoolRealArray( 1 ),
-"values": [ {
-"args": [  ],
-"method": "_on_jump_finished"
-} ]
-}
 
 [sub_resource type="Animation" id=9]
-length = 0.2
+length = 0.3
 step = 0.02
 tracks/0/type = "value"
 tracks/0/path = NodePath("Skin:frame")
@@ -264,44 +198,11 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1 ),
 "update": 1,
 "values": [ 12 ]
-}
-
-[sub_resource type="Animation" id=77]
-resource_name = "LandOnWall"
-length = 0.2
-loop = true
-step = 0.02
-tracks/0/type = "value"
-tracks/0/path = NodePath("Skin:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ 12 ]
-}
-tracks/1/type = "method"
-tracks/1/path = NodePath("XSM/RegionMovement/OnWall")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0.2 ),
-"transitions": PoolRealArray( 1 ),
-"values": [ {
-"args": [  ],
-"method": "_on_landed_on_wall"
-} ]
 }
 
 [sub_resource type="Animation" id=79]
 resource_name = "OnEdge"
 length = 0.6
-loop = true
 step = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("Skin:frame")
@@ -351,7 +252,6 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=14]
 length = 0.6
-loop = true
 step = 0.2
 tracks/0/type = "value"
 tracks/0/path = NodePath("Skin:frame")
@@ -381,20 +281,6 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 1,
 "values": [ 6, 7, 8 ]
-}
-tracks/1/type = "method"
-tracks/1/path = NodePath("XSM/RegionMovement/OnGround/Run")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0.6 ),
-"transitions": PoolRealArray( 1 ),
-"values": [ {
-"args": [  ],
-"method": "play_run"
-} ]
 }
 
 [sub_resource type="ParticlesMaterial" id=81]
@@ -943,6 +829,7 @@ size = 13
 font_data = ExtResource( 9 )
 
 [node name="Example" type="Node2D"]
+position = Vector2( -1, 0 )
 
 [node name="Player" type="KinematicBody2D" parent="."]
 position = Vector2( 520, 223 )
@@ -956,24 +843,20 @@ shape = SubResource( 78 )
 position = Vector2( 1, 0 )
 texture = ExtResource( 12 )
 hframes = 3
-vframes = 11
-frame = 17
+vframes = 12
+frame = 12
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+anims/Ball = SubResource( 86 )
 anims/Brake = SubResource( 2 )
-anims/ColorRed = SubResource( 83 )
-anims/ColorWhite = SubResource( 82 )
-anims/ColorYellow = SubResource( 84 )
-anims/CornerHop = SubResource( 86 )
 anims/Crouch = SubResource( 3 )
 anims/Dash = SubResource( 80 )
 anims/Fall = SubResource( 4 )
-anims/FallTop = SubResource( 13 )
 anims/Idle = SubResource( 7 )
-anims/Idle2 = SubResource( 87 )
+anims/IdleSlow = SubResource( 87 )
+anims/IdleSnore = SubResource( 88 )
 anims/Jump = SubResource( 8 )
 anims/Land = SubResource( 9 )
-anims/LandOnWall = SubResource( 77 )
 anims/OnEdge = SubResource( 79 )
 anims/Run = SubResource( 12 )
 anims/Top2Fall = SubResource( 76 )
@@ -997,303 +880,286 @@ current = true
 script = ExtResource( 19 )
 history_size = 5
 fsm_owner = NodePath("")
-animation_player = NodePath("../AnimationPlayer")
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("")
 
 [node name="RegionJumpPossible" type="Node" parent="Player/XSM"]
 script = ExtResource( 3 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
-next_state = NodePath("/root/EditorNode/@@596/@@597/@@605/@@607/@@611/@@615/@@616/@@617/@@633/@@634/@@643/@@644/@@6617/@@6449/@@6450/@@6451/@@6452/@@6453/@@6454/Example/Player/XSM/RegionDashPossible")
+next_state = NodePath("../RegionDashPossible")
 
 [node name="NoJump" type="Node" parent="Player/XSM/RegionJumpPossible"]
 script = ExtResource( 3 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
-next_state = NodePath("/root/EditorNode/@@596/@@597/@@605/@@607/@@611/@@615/@@616/@@617/@@633/@@634/@@643/@@644/@@6617/@@6449/@@6450/@@6451/@@6452/@@6453/@@6454/Example/Player/XSM/RegionJumpPossible/CoyoteTime")
+next_state = NodePath("../CoyoteTime")
 
 [node name="CoyoteTime" type="Node" parent="Player/XSM/RegionJumpPossible"]
 script = ExtResource( 20 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
-next_state = NodePath("/root/EditorNode/@@596/@@597/@@605/@@607/@@611/@@615/@@616/@@617/@@633/@@634/@@643/@@644/@@6617/@@6449/@@6450/@@6451/@@6452/@@6453/@@6454/Example/Player/XSM/RegionJumpPossible/CanPreJump")
+next_state = NodePath("../CanPreJump")
 
 [node name="CanPreJump" type="Node" parent="Player/XSM/RegionJumpPossible"]
 script = ExtResource( 21 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
-next_state = NodePath("/root/EditorNode/@@596/@@597/@@605/@@607/@@611/@@615/@@616/@@617/@@633/@@634/@@643/@@644/@@6617/@@6449/@@6450/@@6451/@@6452/@@6453/@@6454/Example/Player/XSM/RegionJumpPossible/CanJump")
+next_state = NodePath("../CanJump")
 
 [node name="CanJump" type="Node" parent="Player/XSM/RegionJumpPossible"]
 script = ExtResource( 22 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("")
 
 [node name="RegionDashPossible" type="Node" parent="Player/XSM"]
 script = ExtResource( 3 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("../RegionMovement")
 
 [node name="NoDash" type="Node" parent="Player/XSM/RegionDashPossible"]
 script = ExtResource( 3 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("../CanPreDash")
 
 [node name="CanPreDash" type="Node" parent="Player/XSM/RegionDashPossible"]
 script = ExtResource( 29 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("../CanDash")
 
 [node name="CanDash" type="Node" parent="Player/XSM/RegionDashPossible"]
 script = ExtResource( 30 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("")
 
 [node name="RegionMovement" type="Node" parent="Player/XSM"]
 script = ExtResource( 15 )
 disabled = false
-debug_mode = true
-anim_on_enter = 0
-next_state = NodePath("../RegionLoopColors")
+debug_mode = false
+next_state = NodePath("")
 
 [node name="InAir" type="Node" parent="Player/XSM/RegionMovement"]
 script = ExtResource( 4 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("../OnGround")
 
 [node name="Fall" type="Node" parent="Player/XSM/RegionMovement/InAir"]
 script = ExtResource( 18 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Fall"
+anim_times_to_play = 1
+on_anim_finished = 1
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
 next_state = NodePath("../FallTop")
 
 [node name="FallTop" type="Node" parent="Player/XSM/RegionMovement/InAir"]
-script = ExtResource( 3 )
+script = ExtResource( 17 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Ball"
+anim_times_to_play = 5
+on_anim_finished = 4
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 2
 next_state = NodePath("../Top2Fall")
 
 [node name="Top2Fall" type="Node" parent="Player/XSM/RegionMovement/InAir"]
-script = ExtResource( 3 )
-disabled = false
-debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 2
-next_state = NodePath("../Fall")
-
-[node name="FallThrough" type="Node" parent="Player/XSM/RegionMovement/InAir"]
-script = ExtResource( 3 )
-disabled = false
-debug_mode = false
-anim_on_enter = 1
+script = ExtResource( 17 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Top2Fall"
+anim_times_to_play = 1
 on_anim_finished = 0
-next_state = NodePath("../CornerHop")
+disabled = false
+debug_mode = false
+next_state = NodePath("../Fall")
 
 [node name="CornerHop" type="Node" parent="Player/XSM/RegionMovement/InAir"]
 script = ExtResource( 26 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Ball"
+anim_times_to_play = 1
+on_anim_finished = 1
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
 next_state = NodePath("")
 
 [node name="OnGround" type="Node" parent="Player/XSM/RegionMovement"]
 script = ExtResource( 1 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("../OnWall")
 
 [node name="Land" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 16 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Land"
+anim_times_to_play = 1
+on_anim_finished = 4
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 2
-next_state = NodePath("../IdleRand")
+next_state = NodePath("../Idle")
+
+[node name="Idle" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
+script = ExtResource( 17 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Idle"
+anim_times_to_play = 11
+on_anim_finished = 4
+disabled = false
+debug_mode = false
+next_state = NodePath("../IdleRand/IdleSlow")
 
 [node name="IdleRand" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 2 )
-randomized = false
-state_seed = 0
+randomized = true
 priorities = {
-"Idle": 1,
-"Idle2": 1
+"IdleSlow": 3,
+"IdleSnore": 1
 }
 disabled = false
 debug_mode = false
-anim_on_enter = 0
-next_state = NodePath("../Walk")
+next_state = NodePath("../Run")
 
-[node name="Idle" type="Node" parent="Player/XSM/RegionMovement/OnGround/IdleRand"]
-script = ExtResource( 3 )
+[node name="IdleSlow" type="Node" parent="Player/XSM/RegionMovement/OnGround/IdleRand"]
+script = ExtResource( 17 )
+animation_player = NodePath("../../../../../AnimationPlayer")
+anim_on_enter = "IdleSlow"
+anim_times_to_play = 3
+on_anim_finished = 3
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 1
-next_state = NodePath("../Idle2")
+next_state = NodePath("../IdleSnore")
 
-[node name="Idle2" type="Node" parent="Player/XSM/RegionMovement/OnGround/IdleRand"]
-script = ExtResource( 3 )
+[node name="IdleSnore" type="Node" parent="Player/XSM/RegionMovement/OnGround/IdleRand"]
+script = ExtResource( 17 )
+animation_player = NodePath("../../../../../AnimationPlayer")
+anim_on_enter = "IdleSnore"
+anim_times_to_play = 5
+on_anim_finished = 4
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
-next_state = NodePath("")
+next_state = NodePath("../IdleSlow")
 
 [node name="Walk" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
-script = ExtResource( 3 )
+script = ExtResource( 17 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Walk"
+anim_times_to_play = 1
+on_anim_finished = 0
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
 next_state = NodePath("../Run")
 
 [node name="Run" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 6 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Walk2Run"
+anim_times_to_play = 1
+on_anim_finished = 2
+chained_anim = "Run"
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
 next_state = NodePath("../Brake")
 
 [node name="Brake" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 14 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Brake"
+anim_times_to_play = 1
+on_anim_finished = 1
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
 next_state = NodePath("../OnEdge")
 
 [node name="OnEdge" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 28 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "OnEdge"
+anim_times_to_play = 1
+on_anim_finished = 1
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
 next_state = NodePath("../Crouch")
 
 [node name="Crouch" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 13 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Crouch"
+anim_times_to_play = 1
+on_anim_finished = 1
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
 next_state = NodePath("")
 
 [node name="OnWall" type="Node" parent="Player/XSM/RegionMovement"]
 script = ExtResource( 24 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("../Jumps")
 
 [node name="LandOnWall" type="Node" parent="Player/XSM/RegionMovement/OnWall"]
-script = ExtResource( 3 )
+script = ExtResource( 17 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Land"
+anim_times_to_play = 1
+on_anim_finished = 4
 disabled = false
 debug_mode = false
-anim_on_enter = 1
-on_anim_finished = 0
 next_state = NodePath("../IdleOnWall")
 
 [node name="IdleOnWall" type="Node" parent="Player/XSM/RegionMovement/OnWall"]
-script = ExtResource( 3 )
+script = ExtResource( 17 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Walk"
+anim_times_to_play = 1
+on_anim_finished = 1
 disabled = false
 debug_mode = false
-anim_on_enter = 2
-anim_name = "Walk"
-on_anim_finished = 0
 next_state = NodePath("")
 
 [node name="Jumps" type="Node" parent="Player/XSM/RegionMovement"]
 script = ExtResource( 11 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
 next_state = NodePath("../Dash")
 
 [node name="GroundJump" type="Node" parent="Player/XSM/RegionMovement/Jumps"]
 script = ExtResource( 23 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Jump"
+anim_times_to_play = 1
+on_anim_finished = 2
+chained_anim = "Fall"
 disabled = false
 debug_mode = false
-anim_on_enter = 2
-anim_name = "Jump"
-on_anim_finished = 0
 next_state = NodePath("../WallJump")
 
 [node name="WallJump" type="Node" parent="Player/XSM/RegionMovement/Jumps"]
 script = ExtResource( 25 )
+animation_player = NodePath("../../../../AnimationPlayer")
+anim_on_enter = "Jump"
+anim_times_to_play = 1
+on_anim_finished = 2
+chained_anim = "Fall"
 disabled = false
 debug_mode = false
-anim_on_enter = 2
-anim_name = "Jump"
-on_anim_finished = 0
 next_state = NodePath("")
 
 [node name="Dash" type="Node" parent="Player/XSM/RegionMovement"]
 script = ExtResource( 27 )
+animation_player = NodePath("../../../AnimationPlayer")
+anim_on_enter = "Dash"
+anim_times_to_play = 1
+on_anim_finished = 1
 disabled = false
 debug_mode = false
-anim_on_enter = 0
-next_state = NodePath("")
-
-[node name="RegionLoopColors" type="Node" parent="Player/XSM"]
-script = ExtResource( 5 )
-loop_mode = 3
-loop_mode = 3
-disabled = false
-debug_mode = false
-anim_on_enter = 0
-next_state = NodePath("")
-
-[node name="White" type="Node" parent="Player/XSM/RegionLoopColors"]
-script = ExtResource( 3 )
-disabled = false
-debug_mode = false
-anim_on_enter = 2
-anim_name = "ColorWhite"
-on_anim_finished = 0
-next_state = NodePath("/root/EditorNode/@@596/@@597/@@605/@@607/@@611/@@615/@@616/@@617/@@633/@@634/@@643/@@644/@@6617/@@6449/@@6450/@@6451/@@6452/@@6453/@@6454/Example/Player/XSM/RegionLoopColors/Yellow")
-
-[node name="Yellow" type="Node" parent="Player/XSM/RegionLoopColors"]
-script = ExtResource( 3 )
-disabled = false
-debug_mode = false
-anim_on_enter = 2
-anim_name = "ColorYellow"
-on_anim_finished = 0
-next_state = NodePath("/root/EditorNode/@@596/@@597/@@605/@@607/@@611/@@615/@@616/@@617/@@633/@@634/@@643/@@644/@@6617/@@6449/@@6450/@@6451/@@6452/@@6453/@@6454/Example/Player/XSM/RegionLoopColors/Red")
-
-[node name="Red" type="Node" parent="Player/XSM/RegionLoopColors"]
-script = ExtResource( 3 )
-disabled = false
-debug_mode = false
-anim_on_enter = 2
-anim_name = "ColorRed"
-on_anim_finished = 0
 next_state = NodePath("")
 
 [node name="TileMap" type="TileMap" parent="."]

@@ -32,23 +32,20 @@ extends State
 #
 # PRIVATE FUNCTIONS
 #
-func init_children_states(root_state: State, first_branch: bool) -> void:
+func init_children_states(first_branch: bool) -> void:
 	for c in get_children():
 		if c.get_class() == "State":
 			c.status = INACTIVE
-			c.state_root = root_state
 			if c.target == null:
-				c.target = root_state.target
-			if c.animation_player == null:
-				c.animation_player = root_state.animation_player
+				c.target = state_root.target
 			if first_branch:
 				c.status = ACTIVE
 				c.enter()
-				c.last_state = root_state
-				c.init_children_states(root_state, true)
+				c.last_state = state_root
+				c.init_children_states(true)
 				c._after_enter(null)
 			else:
-				c.init_children_states(root_state, false)
+				c.init_children_states(false)
 
 
 func change_children_status_to_exiting() -> void:

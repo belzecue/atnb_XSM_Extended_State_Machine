@@ -17,8 +17,3 @@ func _on_update(_delta):
 func _after_update(_delta):
 	if target.dir == 0:
 		target.velocity.x = 0
-
-
-# func _on_land_finished():
-# 	print("here")
-# 	var _s = change_state()

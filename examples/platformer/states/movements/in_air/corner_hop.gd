@@ -1,5 +1,5 @@
 tool
-extends State
+extends StateAnimation
 
 
 export (int) var corner_advance = 20

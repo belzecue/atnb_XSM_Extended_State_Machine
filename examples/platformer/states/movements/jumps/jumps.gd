@@ -24,10 +24,6 @@ func _on_update(_delta) -> void:
 	elif target.is_on_ceiling():
 		var _st = change_state("Fall")
 
-	var anim_player = get_node_or_null(animation_player)
-	if anim_player and anim_player.current_animation_position >= 0.1:
-		target.skin.rotation = - target.velocity.angle_to(Vector2.UP)
-		target.skin.position = Vector2()
 
 	if target.velocity.x == 0 and target.dir != 0 and not target.is_on_wall():
 		target.velocity = target.velocity.rotated(target.dir * PI/2)
@@ -38,4 +34,4 @@ func _on_exit(_args) -> void:
 	
 
 func _on_jump_finished() -> void:
-	play("Fall")
+	get_active_substate().play("Fall")
