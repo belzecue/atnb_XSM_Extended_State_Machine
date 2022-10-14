@@ -1,13 +1,13 @@
 XSM Extended State Machine
 ==========================
 
-Latest version : 1.6.1
-(CAREFUL, This version breaks compatibility with the previous one, especially on signals)
+Latest version : 2.0.0
+(CAREFUL, This 2.0 version is a new implementation of XSM, lots of changes to your old XSM woud be needed)
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
 
-For the very first state machine with XSM, try our [HelloWorld example](https://gitlab.com/atnb/xsm#hello-world) down this page. You can also look at the very simple example provided with this plugin to have a glimpse of what is possible with it.
+For the very first state machine with XSM, try our [HelloWorld example](https://gitlab.com/atnb/xsm#hello-world) down this page. You can also look at the  simple examples provided with this plugin to have a glimpse of what is possible with it.
 
 
 Understanding XSM
@@ -15,7 +15,7 @@ Understanding XSM
 
 A Finite State Machine (FSM) is a way for game creators to separate their code's logic into different parts. In Godot, it would be in different Nodes. XSM allows to have substates of a State so that you don't have to create a complex inheritage pattern. You can simply add State Nodes as children of a State Node. If you do so, when a child is active, all his parents are active too and they are going to proceed (update).
 
-If a State has_regions, all its children are active or inactive at the same time, as soon as it is active or inactive.
+If a State is inside a StateRegion, all its children are active or inactive at the same time, as soon as it is active or inactive.
 
 It allows schemas such as :
 <img src="readme_files/stateschart_composition.svg" alt="statechart" width="400"/>
@@ -27,22 +27,25 @@ _more on : [StateCharts](https://statecharts.github.io/what-is-a-statechart.html
 How to use XSM
 ---------------
 
-You can add a StateRoot node to your scene. This State will be the root of your XSM. Then you can add different States to this root and separate the logic of your scene into those different sub-States. You can also add a State as a child of another State and create complex trees of States by doing so.
+You can add a State node to your scene. This State will be the root of your XSM. Then you can add different States to this root and separate the logic of your scene into those different sub-States. You can also add a State as a child of another State and create complex trees of States by doing so.
 
-The RootState is a special State that owns a state_map dictionary (contains the list of all the State names as a key and their State node's reference as a value). It also contains a list of all the current active States.
+There are many different types of States:
+- StateRegion -> All its child States will be active at the same time
+- StateAnimation -> An easy to use State that will automatically play animations from an AnimationPlayer
+- StateLoop -> This State can loop (forward, backwards or ping-pong) through its children States
+- StateRand -> A way to randomly chose one of the children States. A powerful way to switch between idle animations
 
-By default, your XSM is enabled, you can disable it (or any branch of you XSM's tree) in the inspector.
+By default, your XSM is enabled, you can disable it (or any branch of your XSM's tree) in the inspector.
 
 You can use the same names for states in different branches of your StateMachine but THEIR PARENT NAMES MUST BE DIFFERENT. In the state_map and active_states_list, they will be referenced as "ParentName/ChildName" to differentiate theme.
 
 The state_root owns a history of the active_states_list, the size of which can be changed in the StateRoot's inspector. You can call `state_root.was_state_active("StateName")` to know if the StateName was active last frame. Careful: if two states have the same name, they are referenced as "ParentName/StateName" in the state's history.
 
-Each State can have its own target (any Node of the scene, including another State) and animation player specified in the inspector. If you don't, XSM will get the root's ones. If the root does not have a target, it will use its parent as target. If the root does not have an AnimationPlayer, it will just give you a warning.
+Each State can have its own target (any Node of the scene, including another State). If you don't, XSM will get the root's ones. If the root does not have a target, it will use its parent as target.
 
-You can specify in the inspector a default animation that will be played on State's enter (before the call of _on_enter() actually).
+If needed, you can print some debug infos. You can enable debug either in the root of in any State branch. This will print texts from the state that calls change_state(). If you call change_state inside _on_enter(), it will add nested debug texts. Then it also will notify when the change has been done (and reduce the indentation)
 
-If needed, you can print some debug infos. You can enable debug either in the StateRoot of in individual State. This will print texts from the state that calls change_state(). If you call change_state inside _on_enter(), it will add nested debug texts. Then it also will notify when the change has been done (and reduce the indentation)
-
+[TODO]  differnt templates for the different types
 An empty State template is provided in [res://script_template/empty_state.gd](https://gitlab.com/atnb/xsm/-/blob/master/script_templates/empty_state.gd). You just need to add a script to your State and specify this one as a model.
 
 
@@ -213,11 +216,14 @@ To flaticon.com and whoever made the icons used :
 
 To piratesephiroth and MadFlyFish for a C# port : https://github.com/MadFlyFish/XSM-Csharp
 
+To DrPetter's sfxr allowing a quick add of sound effects : https://www.drpetter.se/project_sfxr.html
 
 What's next ?
 -----------------
 
 Well now you can create open source games with Godot and share, right ?
+
+As for me, It might be a Godot 4.0 version...
 
 For any question, issue or request, `atn@lail.fr` or gitlab.
 _See you_

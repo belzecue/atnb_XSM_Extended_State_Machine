@@ -19,11 +19,11 @@ extends EditorPlugin
 
 
 func _enter_tree():
-	add_custom_type("State", "Node", load("res://addons/xsm/state.gd"), 		load("res://addons/xsm/state.png"))
-	add_custom_type("StateAnimation", "Node", load("res://addons/xsm/state_animation.gd"), 		load("res://addons/xsm/state.png"))
-	add_custom_type("StateLoop", "Node", load("res://addons/xsm/state_loop.gd"), 		load("res://addons/xsm/state_loop.png"))
-	add_custom_type("StateRegions", "Node", load("res://addons/xsm/state_regions.gd"), 		load("res://addons/xsm/state_regions.png"))
-	add_custom_type("StateRand", "Node", load("res://addons/xsm/state_rand.gd"), 		load("res://addons/xsm/state_rand.png"))
+	add_custom_type("State", "Node", load("res://addons/xsm/state.gd"), 		load("res://addons/xsm/icons/state.png"))
+	add_custom_type("StateAnimation", "Node", load("res://addons/xsm/state_animation.gd"), 		load("res://addons/xsm/icons/state.png"))
+	add_custom_type("StateLoop", "Node", load("res://addons/xsm/state_loop.gd"), 		load("res://addons/xsm/icons/state_loop.png"))
+	add_custom_type("StateRegions", "Node", load("res://addons/xsm/state_regions.gd"), 		load("res://addons/xsm/icons/state_regions.png"))
+	add_custom_type("StateRand", "Node", load("res://addons/xsm/state_rand.gd"), 		load("res://addons/xsm/icons/state_rand.png"))
 
 func _exit_tree():
 	remove_custom_type("StateRand")

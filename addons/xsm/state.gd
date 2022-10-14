@@ -15,7 +15,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 tool
-class_name State, "res://addons/xsm/state.png"
+class_name State, "res://addons/xsm/icons/state.png"
 extends Node
 
 # To use this plugin, you should inherit this class to add scripts to your nodes

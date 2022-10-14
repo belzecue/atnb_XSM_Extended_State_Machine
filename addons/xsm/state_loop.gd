@@ -15,7 +15,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 tool
-class_name StateLoop, "res://addons/xsm/state_loop.png"
+class_name StateLoop, "res://addons/xsm/icons/state_loop.png"
 extends State
 
 # StateLoop allows for easy navigation in its substates

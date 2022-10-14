@@ -15,7 +15,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 tool
-class_name StateAnimation, "res://addons/xsm/state.png"
+class_name StateAnimation, "res://addons/xsm/icons/state.png"
 extends State
 
 # EXPORTS

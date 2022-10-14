@@ -15,7 +15,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 tool
-class_name StateRegions, "res://addons/xsm/state_regions.png"
+class_name StateRegions, "res://addons/xsm/icons/state_regions.png"
 extends State
 
 # StateRegions has all its children active or inactive at the same time
