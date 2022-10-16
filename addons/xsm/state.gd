@@ -538,7 +538,7 @@ func change_state(new_state: String = "", args_on_enter = null, args_after_enter
 
 func change_to_next( args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
-	change_state_node(get_node_or_null(next_state), args_on_enter, args_after_enter, args_before_exit, args_on_exit)
+	return change_state_node(get_node_or_null(next_state), args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
 
 func change_to_next_substate() -> State:

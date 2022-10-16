@@ -30,6 +30,7 @@ How to use XSM
 You can add a State node to your scene. This State will be the root of your XSM. Then you can add different States to this root and separate the logic of your scene into those different sub-States. You can also add a State as a child of another State and create complex trees of States by doing so.
 
 There are many different types of States:
+- State -> The basic type of State. All the other inherit from this one
 - StateRegion -> All its child States will be active at the same time
 - StateAnimation -> An easy to use State that will automatically play animations from an AnimationPlayer
 - StateLoop -> This State can loop (forward, backwards or ping-pong) through its children States
@@ -37,7 +38,7 @@ There are many different types of States:
 
 By default, your XSM is enabled, you can disable it (or any branch of your XSM's tree) in the inspector.
 
-You can use the same names for states in different branches of your StateMachine but THEIR PARENT NAMES MUST BE DIFFERENT. In the state_map and active_states_list, they will be referenced as "ParentName/ChildName" to differentiate theme.
+You can use the same names for states in different branches of your StateMachine but if so THEIR PARENT NAMES MUST BE DIFFERENT. In the state_map and active_states_list, they will be referenced as "ParentName/ChildName" to differentiate them.
 
 The state_root owns a history of the active_states_list, the size of which can be changed in the StateRoot's inspector. You can call `state_root.was_state_active("StateName")` to know if the StateName was active last frame. Careful: if two states have the same name, they are referenced as "ParentName/StateName" in the state's history.
 
