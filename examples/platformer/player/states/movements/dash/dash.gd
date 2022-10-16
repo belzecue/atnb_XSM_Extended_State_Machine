@@ -120,7 +120,3 @@ func _on_exit(_args) -> void:
 	target.get_node("DashParticles2D").emitting = false
 	target.get_node("DashParticles2D").rotation = 0
 	target.skin.rotation = 0
-
-
-func _on_timeout(_name) -> void:
-	pass

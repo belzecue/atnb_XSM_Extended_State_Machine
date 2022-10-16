@@ -1,9 +1,9 @@
 extends KinematicBody2D
 
 
-# Please, don't use this code, it is just a joke!
+# Please, don't re-use this code, it is just a joke!
 
-var speed := Vector2(100,0)
+export var speed := Vector2(60,0)
 var dir := 1
 var velocity := Vector2()
 

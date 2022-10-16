@@ -20,6 +20,10 @@ extends State
 
 # StateRand Can chose a random state based on priorities
 # Call rand_state() to chose a random substate
+# In this state's inspector, you can define priorities
+# for your sub-States, to have some appear more often
+#
+# Call change_to_next_substate() selects randomly the next State
 
 
 var randomized := true setget set_randomized
@@ -100,7 +104,7 @@ func change_to_next_substate():
 		for i in priorities[c]:
 			rand_array.append(c)
 	var rand_idx = randi() % rand_array.size()
-	var _st =  change_state_force(get_node_or_null(rand_array[rand_idx]))
+	var _st =  change_state_node_force(get_node_or_null(rand_array[rand_idx]))
 
 
 #

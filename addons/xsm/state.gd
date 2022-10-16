@@ -1,4 +1,4 @@
-# MIT LICENSE Copyright 2020-2021 Etienne Blanc - ATN
+# MIT LICENSE Copyright 2020-2023 Etienne Blanc - ATN
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -18,13 +18,23 @@ tool
 class_name State, "res://addons/xsm/icons/state.png"
 extends Node
 
-# To use this plugin, you should inherit this class to add scripts to your nodes
-# This kind of an implementation https://statecharts.github.io
+# To use this plugin, you should inherit this class or the typed inheritances
+# to add scripts to your nodes
+# This is kind of an implementation of https://statecharts.github.io
 # The two main differences with a classic fsm are:
 #   The composition of states and substates
 #   The regions (sibling states that stay active at the same time)
 #
-# Your script can implement those abstract functions:
+# This project offers a few classes to use:
+# * State - for basic usage
+# * StateLoop - to loop through substates
+# * StateRegions - allows parallel states
+# * StateRand - Chose random child states
+# * StateAnimation - launches animations very easily
+#
+# Your State script can implement those abstract functions:
+# Additionnal functions will be available in other State Types
+#
 #  func _on_enter() -> void:
 #  func _after_enter() -> void:
 #  func _on_update(_delta) -> void:
@@ -33,39 +43,45 @@ extends Node
 #  func _on_exit() -> void:
 #  func _on_timeout(_name) -> void:
 #
-# Call a method to your State in the intended track of AnimationPlayer
-# if you want to act (ie change State) after or during an animation
-#
-# In those scripts, you can call the public functions:
+# In your scripts, you can call the public functions:
+# Additionnal functions will be available in other State Types
 #
 #  change_state("MyState")
-#   "MyState" is the name of an existing Node State
+#     "MyState" is the name of an existing Node State
 #  change_state_node(my_state) or change_state_to()
-#   my_state is an existing State Node
-#  is_active("MyState") -> bool
-#   returns true if a state "MyState" is active in this xsm
-#  get_active_states() -> Dictionary:
-#   returns a dictionary with all the active States
-#  get_state("MyState) -> State
-#   returns the State Node "MyState". You have to specify "Parent/MyState" if
-#   "MyState" is not a unique name
-#  get_active_substate()
-#   returns the active substate (all the children if has_regions)
+#     my_state is an existing State Node
+#  change_to_next()
+#     changes to the state defined in next_state
+#  change_to_next_substate()
+#     changes the active substate by its next
+#  change_state_if("MyState", "IfState")
+#     changes to MyState if IfState is active
+#  change_state_node_force(state_node)
+#     changes to state_node even if state_node is alreayd ACTIVE
 #
-#  play("Anim")
-#   plays the animation "Anim" of the State's AnimationPlayer
-#  stop()
-#   stops the current animation
-#  is_playing("Anim)
-#   returns true if "Anim" is playing
+#  is_active("MyState") -> bool
+#     returns true if a state "MyState" is active in this xsm
+#  get_active_states() -> Dictionary:
+#     returns a dictionary with all the active States
+#  get_state("MyState) -> State
+#     returns the State Node "MyState". You have to specify "Parent/MyState" if
+#     "MyState" is not a unique name
+#  get_active_substate()
+#     returns the active substate (all the children if has_regions)
+#  get_previous_active_states(nb_frames)
+#     get an active states array from nb_frames ago
+#  was_state_active(state_name)
+#     returns true if state_name was active last frame
 #
 #  add_timer("Name", time)
-#   adds a timer named "Name" and returns this timer
-#   when the time is out, the function _on_timeout(_name) is called
+#     adds a timer named "Name" and returns this timer
+#     when the time is out, the function _on_timeout(_name) is called
 #  del_timer("Name")
-#   deletes the timer "Name"
-#  is_timer("Name")
-#   returns true if there is a Timer "Name" running in this State
+#     deletes the timer "Name"
+#  del_timers()
+#     Delete all timers
+#  has_timer("Name")
+#     returns true if there is a Timer "Name" running in this State
 
 
 signal state_entered(sender)
@@ -82,21 +98,21 @@ signal pending_state_changed(added_state_node)
 signal pending_state_added(new_state_name)
 signal active_state_list_changed(active_states_list)
 
+#
 # EXPORTS
 #
-# Is exported in "_get_property_list():"
+# They are exported in "_get_property_list():"
 var disabled := false setget set_disabled
-# Is exported in "_get_property_list():"
 var debug_mode := false
-# Is exported in "_get_property_list():"
 var next_state: NodePath
-# Has been moved to create a StateRegions Node
-# export var has_regions := false
-
+var timed := false setget set_timed
+var waiting_time := 1.0
+enum {TIMER_FINISHED_CALLBACK, TIMER_FINISHED_LOOP, TIMER_FINISHED_PARENT, TIMER_FINISHED_SELF}
+var on_timer_finished := 0 setget set_on_timer_finished
 # Is exported in "_get_property_list():" for root only
 var fsm_owner: NodePath
 
-
+#
 # VARS
 #
 enum {INACTIVE, ENTERING, ACTIVE, EXITING}
@@ -106,9 +122,7 @@ var target: Node = null
 # You can change the above line by the following one to be able to use
 # autocompletion on target in any State (could be any type instead of
 # KinematicBody2D of course, such as your Player ;) )!
-# var target: KinematicBody2D = null
-# var anim_player: AnimationPlayer = null
-var last_state: State = null
+#var target: KinematicBody2D = null
 var done_for_this_frame := false
 var state_in_update := false
 
@@ -177,6 +191,9 @@ func _get_configuration_warning() -> String:
 	return ""
 
 
+#
+# PROPERTY LIST, Dynamically exporting thins in inspector
+#
 # We want to add some export variables in their categories
 # And separate those of the root state
 func _get_property_list():
@@ -216,10 +233,27 @@ func _get_property_list():
 	})
 
 	properties.append({
+		name = "timed",
+		type = TYPE_BOOL
+	})
+	if timed:
+		properties.append({
+			name = "waiting_time",
+			type = TYPE_REAL,
+			hint =  PROPERTY_HINT_RANGE,
+			"hint_string": "0.0,10.0,or_greater"
+		})
+		properties.append({
+			name = "on_timer_finished",
+			type = TYPE_INT,
+			hint = PROPERTY_HINT_ENUM, 
+			"hint_string": "Callback Only:0, This State Again:1, Parent's choice:2, Next from Self:3"
+		})
+	properties.append({
 		name = "next_state",
 		type = TYPE_NODE_PATH
 	})
-
+	
 	return properties
 
 
@@ -228,10 +262,14 @@ func property_can_revert(property):
 		return true
 	if property == "next_state":
 		return true
+	if property == "timed":
+		return true
 	return false
 
 
 func _default_next_state() -> NodePath:
+	if is_root():
+		return NodePath()
 	if get_position_in_parent() >= get_parent().get_child_count() - 1:
 		return NodePath()
 	return NodePath("../%s" % get_parent().get_child(get_position_in_parent() + 1).name)
@@ -242,14 +280,8 @@ func property_get_revert(property):
 		return 5
 	if property == "next_state":
 		return _default_next_state()
-
-
-func set_disabled(new_disabled: bool) -> void:
-	disabled = new_disabled
-	if disabled:
-		emit_signal("disabled")
-	else:
-		emit_signal("enabled")
+	if property == "timed":
+		return false
 
 
 # Careful, if your substates have the same name,
@@ -282,11 +314,31 @@ func init_children_states(first_branch: bool) -> void:
 			if first_branch and c == get_child(0):
 				c.status = ACTIVE
 				c.enter()
-				c.last_state = state_root
 				c.init_children_states(true)
 				c._after_enter(null)
 			else:
 				c.init_children_states(false)
+
+
+#
+# SETTERS (for exported variables)
+#
+func set_disabled(new_disabled: bool) -> void:
+	disabled = new_disabled
+	if disabled:
+		emit_signal("disabled")
+	else:
+		emit_signal("enabled")
+
+
+func set_timed(value) -> void:
+	timed = value
+	property_list_changed_notify()
+
+
+func set_on_timer_finished(value):
+	on_timer_finished = value
+	property_list_changed_notify()
 
 
 #
@@ -342,33 +394,52 @@ func _physics_process(_delta: float) -> void:
 
 
 #
-# FUNCTIONS TO INHERIT
+# FUNCTIONS TO INHERIT IN YOUR STATES
 #
+
+# This function is called when the state enters
+# XSM enters the root first, the the children
 func _on_enter(_args) -> void:
 	pass
 
 
+# This function is called just after the state enters
+# XSM after_enters the children first, then the parent
 func _after_enter(_args) -> void:
 	pass
 
 
+# This function is called each frame if the state is ACTIVE
+# XSM updates the root first, then the children
 func _on_update(_delta: float) -> void:
 	pass
 
 
+# This function is called each frame after all the update calls
+# XSM after_updates the children first, then the root
 func _after_update(_delta: float) -> void:
 	pass
 
 
+# This function is called before the State exits
+# XSM before_exits the root first, then the children
 func _before_exit(_args) -> void:
 	pass
 
 
+# This function is called when the State exits
+# XSM before_exits the children first, then the root
 func _on_exit(_args) -> void:
 	pass
 
 
-func _on_timeout(_name: String) -> void:
+# when StateAutomaticTimer timeout()
+func _state_timeout() -> void:
+	pass
+
+
+# Called when any other Timer times out
+func _on_timeout(_name) -> void:
 	pass
 
 
@@ -436,9 +507,6 @@ func change_state_node(new_state_node: State = null, args_on_enter = null, args_
 	# If ENTERED, change the status to ACTIVE
 	active_root.enter_children(args_on_enter, args_after_enter)
 
-	# sets this State as last_state for the new one
-	new_state_node.last_state = self
-
 	# set "done this frame" to avoid another round of state change in this branch
 	active_root.reset_done_this_frame(true)
 
@@ -463,46 +531,37 @@ func change_state(new_state: String = "", args_on_enter = null, args_after_enter
 		args_before_exit = null, args_on_exit = null) -> State:
 
 	# finds the node of new_state, return self if empty
-	var new_state_node: State = find_state_node_or_self(new_state)
+	var new_state_node: State = find_state_node_or_null(new_state)
 
 	return change_state_node(new_state_node, args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
 
 func change_to_next( args_on_enter = null, args_after_enter = null,
-		args_before_exit = null, args_on_exit = null):
+		args_before_exit = null, args_on_exit = null) -> State:
 	change_state_node(get_node_or_null(next_state), args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
 
-func change_to_next_substate():
+func change_to_next_substate() -> State:
 	var substate = get_active_substate()
 	if substate:
-		substate.change_to_next()
+		return substate.change_to_next()
+	return null
 
 
 func change_state_if(new_state: String, if_state: String) -> State:
-	var s = find_state_node_or_self(if_state)
-	if s == null or s.status == ACTIVE:
+	var s = find_state_node_or_null(if_state)
+	if s and s.status == ACTIVE:
 		return change_state(new_state)
 	return null
 
 
-func change_state_force(new_state_node: State = null, args_on_enter = null, args_after_enter = null,
+func change_state_node_force(new_state_node: State = null, args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
 	return change_state_node(new_state_node, args_on_enter, args_after_enter,
 			args_before_exit, args_on_exit, true)
 
-
-func has_parent(state_node: State) -> bool:
-	var parent = get_parent()
-	if parent == state_node:
-		return true
-	if parent.get_class() != "State" or parent == state_root:
-		return false
-	return parent.has_parent(state_node)
-
-
 func is_active(state_name: String) -> bool:
-	var s: State = find_state_node_or_self(state_name)
+	var s: State = find_state_node_or_null(state_name)
 	if s == null:
 		return false
 	return s.status == ACTIVE
@@ -517,7 +576,7 @@ func get_active_substate():
 
 
 func get_state(state_name: String) -> State:
-	return find_state_node_or_self(state_name)
+	return find_state_node_or_null(state_name)
 
 
 # index 0 is the most recent history
@@ -535,22 +594,42 @@ func was_state_active(state_name: String, history_id: int = 0) -> bool:
 	return get_previous_active_states(history_id).has(state_name)
 
 
-func add_timer(name: String, time: float) -> Timer:
-	del_timer(name)
+func find_state_node_or_null(new_state: String) -> State:
+	if not new_state or new_state == "":
+		return null
+		
+	if new_state == get_name():
+		return self
+
+	var map: Dictionary = state_root.state_map
+	if map.has(new_state):
+		return map[new_state]
+
+	if state_root.duplicate_names.has(new_state):
+		if map.has( str("%s/%s" % [name, new_state]) ):
+			return map[ str("%s/%s" % [name, new_state]) ]
+		elif map.has( str("%s/%s" % [get_parent().name, new_state]) ):
+			return map[ str("%s/%s" % [get_parent().name, new_state]) ]
+
+	return null
+
+
+func add_timer(timer_name: String, time: float) -> Timer:
+	del_timer(timer_name)
 	var timer := Timer.new()
 	add_child(timer)
-	timer.set_name(name)
+	timer.set_name(timer_name)
 	timer.set_one_shot(true)
 	timer.start(time)
-	timer.connect("timeout",self,"_on_timer_timeout",[name])
+	timer.connect("timeout", self, "_on_timer_timeout", [timer_name])
 	return timer
 
 
-func del_timer(name: String) -> void:
-	if has_node(name):
-		get_node(name).stop()
-		get_node(name).queue_free()
-		get_node(name).set_name("to_delete")
+func del_timer(timer_name: String) -> void:
+	if has_node(timer_name):
+		get_node(timer_name).stop()
+		get_node(timer_name).queue_free()
+		get_node(timer_name).set_name("to_delete")
 
 
 func del_timers() -> void:
@@ -561,8 +640,8 @@ func del_timers() -> void:
 			c.set_name("to_delete")
 
 
-func has_timer(name: String) -> bool:
-	return has_node(name)
+func has_timer(timer_name: String) -> bool:
+	return has_node(timer_name)
 
 
 #
@@ -596,23 +675,6 @@ func add_active_state(state_to_add: State) -> void:
 		name_in_state_map = str("%s/%s" % [parent_name, state_name])
 	state_root.active_states[name_in_state_map] = state_to_add
 	emit_signal("active_state_list_changed", state_root.active_states)
-
-
-func find_state_node_or_self(new_state: String) -> State:
-	if new_state == get_name() or new_state == "":
-		return self
-
-	var map: Dictionary = state_root.state_map
-	if map.has(new_state):
-		return map[new_state]
-
-	if state_root.duplicate_names.has(new_state):
-		if map.has( str("%s/%s" % [name, new_state]) ):
-			return map[ str("%s/%s" % [name, new_state]) ]
-		elif map.has( str("%s/%s" % [get_parent().name, new_state]) ):
-			return map[ str("%s/%s" % [get_parent().name, new_state]) ]
-
-	return null
 
 
 func get_active_root(new_state_node: State, return_parent: bool = false) -> State:
@@ -664,9 +726,9 @@ func change_children_status_to_exiting() -> void:
 
 
 func exit(args = null) -> void:
-	del_timers()
 	_on_exit(args)
 	status = INACTIVE
+	del_timer("StateAutomaticTimer")
 	remove_active_state(self)
 	emit_signal("state_exited", self)
 	if not is_root():
@@ -701,6 +763,8 @@ func change_children_status_to_entering(new_state_path: NodePath) -> void:
 func enter(args = null) -> void:
 	status = ACTIVE
 	add_active_state(self)
+	if timed:
+		add_timer("StateAutomaticTimer", waiting_time)
 	_on_enter(args)
 	emit_signal("state_entered", self)
 	if not is_root():
@@ -741,9 +805,19 @@ func new_pending_state(new_state_node: State, args_on_enter = null,
 	emit_signal("pending_state_added", new_state_node)
 
 
-func _on_timer_timeout(timer_name: String) -> void:
-	del_timer(timer_name)
-	_on_timeout(timer_name)
+func _on_timer_timeout(timer_name: String = "StateAutomaticTimer") -> void:
+	if timer_name == "StateAutomaticTimer":
+		_state_timeout()
+		match on_timer_finished:
+			TIMER_FINISHED_LOOP:
+				change_state_node_force()
+			TIMER_FINISHED_PARENT:
+				if get_parent().get_class() == "State":
+					get_parent().change_to_next_substate()
+			TIMER_FINISHED_SELF:
+				change_to_next()
+	else:
+		_on_timeout(timer_name)
 
 
 func reset_done_this_frame(new_done: bool) -> void:

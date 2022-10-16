@@ -6,7 +6,7 @@ export var prejump_time = 0.4
 
 # FUNCTIONS AVAILABLE TO INHERIT
 func _on_enter(_args) -> void:
-	if has_timer("PreJump"):
+	if has_timer("Prejump"):
 		choose_jump()
 
 

@@ -2,7 +2,7 @@ XSM Extended State Machine
 ==========================
 
 Latest version : 2.0.0
-(CAREFUL, This 2.0 version is a new implementation of XSM, lots of changes to your old XSM woud be needed)
+(CAREFUL, This 2.0 version is a new (better) implementation of XSM, lots of changes to your old XSM woud be needed to an old XSM)
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
 
@@ -45,7 +45,6 @@ Each State can have its own target (any Node of the scene, including another Sta
 
 If needed, you can print some debug infos. You can enable debug either in the root of in any State branch. This will print texts from the state that calls change_state(). If you call change_state inside _on_enter(), it will add nested debug texts. Then it also will notify when the change has been done (and reduce the indentation)
 
-[TODO]  differnt templates for the different types
 An empty State template is provided in [res://script_template/empty_state.gd](https://gitlab.com/atnb/xsm/-/blob/master/script_templates/empty_state.gd). You just need to add a script to your State and specify this one as a model.
 
 
@@ -64,6 +63,7 @@ So, in each State's script, you can implement the following abstract public func
 #  func _after_update(_delta) -> void:
 #  func _before_exit(args) -> void:
 #  func _on_exit(args) -> void:
+#  func _state_timeout() -> void:
 #  func _on_timeout(_name) -> void:
 ```
 
@@ -81,35 +81,53 @@ In any State node, you can call the following public functions:
 * `change_state_node(my_state) -> State` or `change_state_to(my_state) -> State`
    Where my_state is an existing Node State. This function accepts the same arguments as change_state(). If no argument is entered, it will try to change state to self.
    
-* `next_state() -> State`
-   Helper functions to change to the next non disabled sibling state (only if parent does not have_regions). It ends at the last sibling on this branch.
+* `change_to_next( args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null) -> State:`
+   Helper functions to change to the State defined in next_state.
    
-* `prev_state() -> State`
-   Helper functions to change to the previous non disabled sibling state (only if parent does not have_regions). It ends at the first sibling on this branch.
+* `change_to_next_substate() -> State:`
+   Helper functions to ask to the parent state which one is the next_state (very useful for StateRand or StateLoop).
    
+* `change_state_if(new_state: String, if_state: String) -> State`
+   This one changes state only if the second state specified is active
+   
+* `change_state_node_force(new_state_node: State = null, args_on_enter = null, args_after_enter = null,args_before_exit = null, args_on_exit = null) -> State:`
+   Very important ! This function forces the change even if the new_state_node is already active
+
 * `is_active("MyState") -> bool`
    returns true if a state "MyState" is active in this xsm
-   
-* `was_active("MyState") -> bool`
-   returns true if a state "MyState" was active in this xsm last frame (_physics_process)
-   
-* `was_active("MyState", history_id) -> bool`
-   returns true if a state "MyState" was active in this `xsm history_id + 1` frames (_physics_process) ago
-   
-*  `get_active_states() -> Dictionary`
-   returns a dictionary with all the active States
-
-*  `get_previous_active_states(history_id) -> Dictionary`
-   returns a dictionary with all the active States from `history_id + 1` frames ago
 
 * `get_active_substate()`
    if active, returns the active substate (or all the children if has_regions)
 
-* `find_state_node("MyState") -> State`
-   returns the State Node "MyState", You have to specify "Parent/MyState" if "MyState" is not a unique name.
-
 * `get_state("MyState") -> State`
    an alias for find_state_node()
+   
+* `get_previous_active_states(history_id) -> Dictionary`
+   returns a dictionary with all the active States from `history_id + 1` frames ago
+
+* `was_state_active(state_name: String, history_id: int = 0) -> bool`
+   returns true if a state "MyState" was active in this xsm last frame (_physics_process)
+   You can specify an history_id to get the result for older frames
+
+* `find_state_node_or_null("MyState") -> State`
+   returns the State Node "MyState", You have to specify "Parent/MyState" if "MyState" is not a unique name.
+
+
+* `add_timer("Name", time)`
+   adds a timer named "Name" and returns this timer
+   when the time is out, the function `_on_timeout(_name)` is called
+   
+* `del_timer("Name")`
+   deletes the timer "Name"
+   
+* `del_timers()`
+   deletes all the timers of this State
+   
+* `has_timer("Name")`
+   returns true if there is a Timer "Name" running in this State
+
+
+For StateAnimation only:
 
 * `play("Anim")`
    plays the animation "Anim" of the State's AnimationPlayer
@@ -135,18 +153,18 @@ In any State node, you can call the following public functions:
 * `is_playing("Anim)`
    returns true if "Anim" is playing
 
-* `add_timer("Name", time)`
-   adds a timer named "Name" and returns this timer
-   when the time is out, the function `_on_timeout(_name)` is called
-   
-* `del_timer("Name")`
-   deletes the timer "Name"
-   
-* `del_timers()`
-   deletes all the timers of this State
-   
-* `has_timer("Name")`
-   returns true if there is a Timer "Name" running in this State
+
+For StateLoop only:
+
+* `next_in_loop(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null)`
+   Change state to the next in loop, depending on the loop_mode
+
+* `prev_in_loop(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null)`
+   Change state to the previous in loop, depending on the loop_mode
+
+* `exit_loop(args_on_enter = null, args_after_enter = null, args_before_exit = null, args_on_exit = null)`
+   Change state to the exit state defined in the loop's inspector
+
 
 
 **Signals**
@@ -163,12 +181,15 @@ The States are calling different signals during their life :
 * `signal disabled()`
 * `signal enabled()`
 
-The StateRoot has additional signals :
-
+The root state can emit
 * `signal some_state_changed(sender, new_state_node)`
 * `signal pending_state_changed(added_state_node)`
 * `signal pending_state_added(new_state_name)`
 * `signal active_state_list_changed(active_states_list)`
+
+A StateLoop can emit
+* `signal looped())`
+
 
 
 Hello World
@@ -178,9 +199,8 @@ Your first try with XSM could be to :
 * Install the module (using godot's AssetLib on the top of your editor)
 * Activate the module (project / parameters / Extensions and check activate for XSM)
 * Select the node that needs a StateMachine (for example a character)
-* Add a new child node (or Ctrl-A) of type StateRoot
-   You should see a yellow warning on your StateRoot node, select the node and in the inspector, assign your character node as your StateRoot's target
-* You can now add two State nodes to your StateRoot (same as above : Ctrl-A)
+* Add a new child node (or Ctrl-A) of type State
+* You can now add two State nodes as children to your State (same as above : Ctrl-A)
 * Add a script to the first State and chose the Empty State template.
 * Add a script to the second State and chose the Empty State template.
 * in the first script, in the _on_enter(_args) function, add a line with:
@@ -197,8 +217,11 @@ Your first try with XSM could be to :
    if Input.is_action_just_pressed("ui_accept"):
       change_state("State")
 ```
-And here you are, you made your first state machine with XSM!
+And here you are, you made your first state machine with XSM! You can launch it with F5 and press the spacebar to switch states.
+The output should be explicit ;)
 
+
+To go further, you can look at the examples provided with the addon.
 
 Special Thanks
 -----------------
@@ -218,10 +241,12 @@ To piratesephiroth and MadFlyFish for a C# port : https://github.com/MadFlyFish/
 
 To DrPetter's sfxr allowing a quick add of sound effects : https://www.drpetter.se/project_sfxr.html
 
+To André for the platformer's music : [link to add]
+
 What's next ?
 -----------------
 
-Well now you can create open source games with Godot and share, right ?
+Well now you can create open source games with Godot and share, right ? Please report any bug and suggest enhancements to the plugin.
 
 As for me, It might be a Godot 4.0 version...
 

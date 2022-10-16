@@ -19,7 +19,9 @@ class_name StateLoop, "res://addons/xsm/icons/state_loop.png"
 extends State
 
 # StateLoop allows for easy navigation in its substates
-# Just call next or prev to advance in the loop
+# Just call next_in_loop() or prev_in_loop() to advance in the children loop
+# exit_loop() will chnage_state to the exit_loop State defined in the inspector
+
 
 signal looped()
 
@@ -38,7 +40,6 @@ func set_loop_mode(value):
 	loop_mode = value
 	if loop_mode == LoopMode.LOOP_BACKWARD:
 		moving_forward = false
-
 
 
 # We want to add some export variables in their categories
@@ -69,27 +70,6 @@ func _get_property_list():
 	})
 
 	return properties
-
-# func _default_next_state() -> NodePath:
-# 	match loop_mode:
-# 		LoopMode.LOOP_DISABLED:
-# 			return NodePath()
-
-# 		LoopMode.LOOP_FORWARD:
-# 			if get_position_in_parent() >= get_parent().get_child_count() - 1:
-# 				return NodePath()
-# 			return get_parent().get_child(get_position_in_parent() + 1).get_path()
-
-# 		LoopMode.LOOP_BACKWARD:
-# 			if get_position_in_parent() == 0:
-# 				return NodePath()
-# 			return get_parent().get_child(get_position_in_parent() - 1).get_path()
-
-# 		LoopMode.LOOP_PING_PONG:
-# 			if get_position_in_parent() >= get_parent().get_child_count() - 1:
-# 				return NodePath()
-# 			return get_parent().get_child(get_position_in_parent() + 1).get_path()
-# 	return NodePath()
 
 
 #

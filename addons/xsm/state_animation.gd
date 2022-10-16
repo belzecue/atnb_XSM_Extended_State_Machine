@@ -18,6 +18,28 @@ tool
 class_name StateAnimation, "res://addons/xsm/icons/state.png"
 extends State
 
+# StateAnimation is there for all your States that play an animation on enter
+#
+# The usual way of using this class is to add a StateAnimation in your tree
+# Then, you can chose an anim_on_enter and how much time it will play
+# In on_anim_finished in the inspector, you can define what you want to do next
+#
+# You have additionnal functions to inherit:
+#  _on_anim_finished(_name)
+#     where _name is the name of the animation
+#     You can differentiate between animations played (using play() below)
+#
+# There are additionnal functions to call in your StateAnimation:
+#  play(anim: String, custom_speed: float = 1.0, from_end: bool = false) -> void:
+#  play_backwards(anim: String) -> void:
+#  play_blend(anim: String, custom_blend: float, custom_speed: float = 1.0,
+#  play_sync(anim: String, custom_speed: float = 1.0,
+#  pause() -> void:
+#  queue(anim: String) -> void:
+#  stop(reset: bool = true) -> void:
+#  is_playing(anim: String) -> bool:
+
+
 # EXPORTS
 #
 # Is exported in "_get_property_list():"
@@ -48,16 +70,6 @@ func _get_configuration_warning() -> String:
 	return ""
 
 
-func set_anim_on_enter(value):
-	anim_on_enter = value
-	property_list_changed_notify()
-
-
-func set_on_anim_finished(value):
-	on_anim_finished = value
-	property_list_changed_notify()
-
-
 # We want to add some export variables in their categories
 # And separate those of the root state
 func _get_property_list():
@@ -65,7 +77,7 @@ func _get_property_list():
 
 	# Will guess the AnimationPlayer each time
 	# the inspector loads for this Node
-	if animation_player.is_empty():
+	if not animation_player or animation_player.is_empty():
 		animation_player = guess_animation_player()
 
 	# Will guess the animation to play
@@ -136,6 +148,18 @@ func property_get_revert(property):
 		return 1
 	return .property_get_revert(property)
 
+
+#
+# SETTERS
+#
+func set_anim_on_enter(value):
+	anim_on_enter = value
+	property_list_changed_notify()
+
+
+func set_on_anim_finished(value):
+	on_anim_finished = value
+	property_list_changed_notify()
 
 
 #

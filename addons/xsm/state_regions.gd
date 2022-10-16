@@ -21,15 +21,6 @@ extends State
 # StateRegions has all its children active or inactive at the same time
 
 #
-# INIT
-#
-
-
-#
-# PUBLIC FUNCTIONS
-#
-
-#
 # PRIVATE FUNCTIONS
 #
 func init_children_states(first_branch: bool) -> void:
@@ -41,7 +32,6 @@ func init_children_states(first_branch: bool) -> void:
 			if first_branch:
 				c.status = ACTIVE
 				c.enter()
-				c.last_state = state_root
 				c.init_children_states(true)
 				c._after_enter(null)
 			else:

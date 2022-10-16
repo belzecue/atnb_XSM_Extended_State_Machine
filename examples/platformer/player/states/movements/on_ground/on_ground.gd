@@ -28,12 +28,13 @@ func _on_update(delta):
 		move_sound.play()
 		move_sound.pitch_scale = 1.0 + ( randf() - 0.5 ) / 5
 
-
 	if target.dir == 0:
 		# Check if player in on the edge to stop the movement
 		var result = target.ray( sign(target.velocity.x), target.BOTTOM, 1.5)
 		if result.empty():
 			var _st = change_state("OnEdge")
+		elif is_active("Land"):
+			target.velocity = Vector2.ZERO
 		elif abs(target.velocity.x) < walk_margin:
 			if not is_active("Crouch") and not is_active("Land"):
 				var _st = change_state("IdleRand")
