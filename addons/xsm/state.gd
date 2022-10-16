@@ -147,6 +147,7 @@ var changing_state_level := 0
 # INIT
 #
 func _ready() -> void:
+	prints("state", name)
 	# Deal with the next_state of the previous state
 	# If you want to avoid setting an empty next_state, set it to itself in the inspector
 	var node_pos = get_position_in_parent()
@@ -187,7 +188,7 @@ func _exit_tree() -> void:
 func _get_configuration_warning() -> String:
 	for c in get_children():
 		if c.get_class() != "State":
-			return "Error : this Node has a non State child (%s)" % c.get_name()
+			return "Warning : this Node has a non State child (%s)" % c.get_name()
 	return ""
 
 
@@ -529,10 +530,8 @@ func change_state_node(new_state_node: State = null, args_on_enter = null, args_
 
 func change_state(new_state: String = "", args_on_enter = null, args_after_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
-
-	# finds the node of new_state, return self if empty
+	# finds the node of new_state, return null if empty
 	var new_state_node: State = find_state_node_or_null(new_state)
-
 	return change_state_node(new_state_node, args_on_enter, args_after_enter, args_before_exit, args_on_exit)
 
 
@@ -559,6 +558,7 @@ func change_state_node_force(new_state_node: State = null, args_on_enter = null,
 		args_before_exit = null, args_on_exit = null) -> State:
 	return change_state_node(new_state_node, args_on_enter, args_after_enter,
 			args_before_exit, args_on_exit, true)
+
 
 func is_active(state_name: String) -> bool:
 	var s: State = find_state_node_or_null(state_name)

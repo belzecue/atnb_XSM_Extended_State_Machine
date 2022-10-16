@@ -1,7 +1,7 @@
 XSM Extended State Machine
 ==========================
 
-Latest version : 2.0.0
+Latest version : 2.0.1
 (CAREFUL, This 2.0 version is a new (better) implementation of XSM, lots of changes to your old XSM woud be needed to an old XSM)
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).
@@ -32,7 +32,7 @@ You can add a State node to your scene. This State will be the root of your XSM.
 There are many different types of States:
 - State -> The basic type of State. All the other inherit from this one
 - StateRegion -> All its child States will be active at the same time
-- StateAnimation -> An easy to use State that will automatically play animations from an AnimationPlayer
+- StateAnimation -> An easy to use State that will automatically play animations from an AnimationPlayer. The AnimationPlayer has to be either defined in the inspector or simply be a sibling of your XSM's root
 - StateLoop -> This State can loop (forward, backwards or ping-pong) through its children States
 - StateRand -> A way to randomly chose one of the children States. A powerful way to switch between idle animations
 

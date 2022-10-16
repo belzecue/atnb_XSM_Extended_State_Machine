@@ -5,6 +5,7 @@
 [ext_resource path="res://addons/xsm/state.gd" type="Script" id=3]
 [ext_resource path="res://examples/platformer/player/states/movements/in_air/in_air.gd" type="Script" id=4]
 [ext_resource path="res://examples/platformer/assets/sprites/collectables/new_ship.png" type="Texture" id=5]
+[ext_resource path="res://addons/xsm/state_animation.gd" type="Script" id=6]
 [ext_resource path="res://examples/platformer/assets/sprites/decor/tilemap.png" type="Texture" id=7]
 [ext_resource path="res://examples/platformer/player/player.gd" type="Script" id=8]
 [ext_resource path="res://examples/platformer/level/font_TIMESS__.ttf" type="DynamicFontData" id=9]
@@ -14,7 +15,6 @@
 [ext_resource path="res://examples/platformer/player/states/movements/on_ground/crouch.gd" type="Script" id=13]
 [ext_resource path="res://examples/platformer/player/states/movements/on_ground/brake.gd" type="Script" id=14]
 [ext_resource path="res://examples/platformer/player/states/movements/movement.gd" type="Script" id=15]
-[ext_resource path="res://addons/xsm/state_animation.gd" type="Script" id=17]
 [ext_resource path="res://examples/platformer/player/states/movements/in_air/fall.gd" type="Script" id=18]
 [ext_resource path="res://addons/xsm/state_regions.gd" type="Script" id=19]
 [ext_resource path="res://examples/platformer/player/states/jump_possible/coyote_time.gd" type="Script" id=20]
@@ -1132,14 +1132,14 @@ script = ExtResource( 3 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../RegionDashPossible")
 
 [node name="NoJump" type="Node" parent="Player/XSM/RegionJumpPossible"]
 script = ExtResource( 3 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../CoyoteTime")
 
 [node name="CoyoteTime" type="Node" parent="Player/XSM/RegionJumpPossible"]
 script = ExtResource( 20 )
@@ -1148,14 +1148,14 @@ debug_mode = false
 timed = true
 waiting_time = 0.1
 on_timer_finished = 1
-next_state = NodePath("")
+next_state = NodePath("../CanPreJump")
 
 [node name="CanPreJump" type="Node" parent="Player/XSM/RegionJumpPossible"]
 script = ExtResource( 21 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../CanJump")
 
 [node name="CanJump" type="Node" parent="Player/XSM/RegionJumpPossible"]
 script = ExtResource( 22 )
@@ -1169,21 +1169,21 @@ script = ExtResource( 3 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../RegionMovement")
 
 [node name="NoDash" type="Node" parent="Player/XSM/RegionDashPossible"]
 script = ExtResource( 3 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../CanPreDash")
 
 [node name="CanPreDash" type="Node" parent="Player/XSM/RegionDashPossible"]
 script = ExtResource( 29 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../CanDash")
 
 [node name="CanDash" type="Node" parent="Player/XSM/RegionDashPossible"]
 unique_name_in_owner = true
@@ -1205,7 +1205,7 @@ script = ExtResource( 4 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../OnGround")
 
 [node name="Fall" type="Node" parent="Player/XSM/RegionMovement/InAir"]
 script = ExtResource( 18 )
@@ -1219,7 +1219,7 @@ timed = false
 next_state = NodePath("../Fall")
 
 [node name="FallTop" type="Node" parent="Player/XSM/RegionMovement/InAir"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../AnimationPlayer")
 anim_on_enter = "Ball"
 anim_times_to_play = 5
@@ -1230,7 +1230,7 @@ timed = false
 next_state = NodePath("../Fall")
 
 [node name="Top2Fall" type="Node" parent="Player/XSM/RegionMovement/InAir"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../AnimationPlayer")
 anim_on_enter = "Top2Fall"
 anim_times_to_play = 1
@@ -1256,10 +1256,10 @@ script = ExtResource( 1 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../OnWall")
 
 [node name="Land" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../AnimationPlayer")
 anim_on_enter = "Land"
 anim_times_to_play = 1
@@ -1270,7 +1270,7 @@ timed = false
 next_state = NodePath("../IdleRand/IdleSlow")
 
 [node name="Idle" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../AnimationPlayer")
 anim_on_enter = "Idle"
 anim_times_to_play = 11
@@ -1293,7 +1293,7 @@ timed = false
 next_state = NodePath("../Run")
 
 [node name="IdleSlow" type="Node" parent="Player/XSM/RegionMovement/OnGround/IdleRand"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../../AnimationPlayer")
 anim_on_enter = "IdleSlow"
 anim_times_to_play = 5
@@ -1304,7 +1304,7 @@ timed = false
 next_state = NodePath("../IdleSlow")
 
 [node name="IdleSnore" type="Node" parent="Player/XSM/RegionMovement/OnGround/IdleRand"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../../AnimationPlayer")
 anim_on_enter = "IdleSnore"
 anim_times_to_play = 3
@@ -1315,7 +1315,7 @@ timed = false
 next_state = NodePath("../IdleSlow")
 
 [node name="Walk" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../AnimationPlayer")
 anim_on_enter = "Walk"
 anim_times_to_play = 1
@@ -1323,10 +1323,10 @@ on_anim_finished = 0
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../Run")
 
 [node name="Run" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../AnimationPlayer")
 anim_on_enter = "Run"
 anim_times_to_play = 1
@@ -1334,7 +1334,7 @@ on_anim_finished = 0
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../Brake")
 
 [node name="Brake" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 14 )
@@ -1345,7 +1345,7 @@ on_anim_finished = 1
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../OnEdge")
 
 [node name="OnEdge" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 28 )
@@ -1356,7 +1356,7 @@ on_anim_finished = 1
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../Crouch")
 
 [node name="Crouch" type="Node" parent="Player/XSM/RegionMovement/OnGround"]
 script = ExtResource( 13 )
@@ -1374,10 +1374,10 @@ script = ExtResource( 24 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../Jumps")
 
 [node name="LandOnWall" type="Node" parent="Player/XSM/RegionMovement/OnWall"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../AnimationPlayer")
 anim_on_enter = "Land"
 anim_times_to_play = 1
@@ -1385,10 +1385,10 @@ on_anim_finished = 4
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../IdleOnWall")
 
 [node name="IdleOnWall" type="Node" parent="Player/XSM/RegionMovement/OnWall"]
-script = ExtResource( 17 )
+script = ExtResource( 6 )
 animation_player = NodePath("../../../../AnimationPlayer")
 anim_on_enter = "Walk"
 anim_times_to_play = 1
@@ -1403,7 +1403,7 @@ script = ExtResource( 11 )
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../Dash")
 
 [node name="GroundJump" type="Node" parent="Player/XSM/RegionMovement/Jumps"]
 script = ExtResource( 23 )
@@ -1415,7 +1415,7 @@ chained_anim = "Fall"
 disabled = false
 debug_mode = false
 timed = false
-next_state = NodePath("")
+next_state = NodePath("../WallJump")
 
 [node name="WallJump" type="Node" parent="Player/XSM/RegionMovement/Jumps"]
 script = ExtResource( 25 )
@@ -1627,7 +1627,7 @@ speed = Vector2( 100, 0 )
 position = Vector2( -1.5, -1 )
 frames = SubResource( 126 )
 animation = "Walk"
-frame = 4
+frame = 2
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AnEgg"]

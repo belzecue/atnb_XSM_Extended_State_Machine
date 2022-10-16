@@ -52,21 +52,28 @@ var chained_anim := ""
 var chained := false
 
 # Is exported in "_get_property_list():" for root only
-var animation_player: NodePath
+var animation_player: NodePath = NodePath() setget set_animation_player
 
 #
 # INIT
 #
 func _ready() -> void:
+	prints("state animation", name)
+	get_node_or_null("")
+	prints("state animation 2", name)
 	if Engine.is_editor_hint():
 		var _conn = connect("renamed", self, "_on_StateAnimation_renamed")
 	
 	set_anim_on_enter(anim_on_enter)
-	if animation_player.is_empty():
+	if not animation_player or animation_player.is_empty():
 		animation_player = guess_animation_player()
 	
 
 func _get_configuration_warning() -> String:
+	if not animation_player or animation_player.is_empty():
+		var warning := "Warning : Your StateAnimation does not have an AnimationPlayer set up.\n"
+		warning += "Either set it in the inspector or have an AnimationPlayer be a sibling of your XSM's root"
+		return warning
 	return ""
 
 
@@ -81,7 +88,7 @@ func _get_property_list():
 		animation_player = guess_animation_player()
 
 	# Will guess the animation to play
-	var ap = get_node(animation_player)
+	var ap = get_node_or_null(animation_player)
 	if ap and ap.has_animation(name) and anim_on_enter == "":
 		anim_on_enter = name
 
@@ -98,8 +105,9 @@ func _get_property_list():
 	})
 
 	var anims_hint = "NONE"
-	for anim in get_node(animation_player).get_animation_list():
-		anims_hint = "%s,%s" % [anims_hint, anim]
+	if ap:
+		for anim in get_node_or_null(animation_player).get_animation_list():
+			anims_hint = "%s,%s" % [anims_hint, anim]
 	properties.append({
 		name = "anim_on_enter",
 		type = TYPE_STRING,
@@ -128,6 +136,7 @@ func _get_property_list():
 			"hint_string": anims_hint
 		})
 
+	update_configuration_warning()
 	return properties
 
 
@@ -160,6 +169,12 @@ func set_anim_on_enter(value):
 func set_on_anim_finished(value):
 	on_anim_finished = value
 	property_list_changed_notify()
+
+
+# this setter to recheck the warning on a missing AnimationPlayer
+func set_animation_player(value):
+	animation_player = value
+	update_configuration_warning()
 
 
 #
@@ -290,6 +305,6 @@ func _on_AnimationPlayer_animation_finished(finished_animation):
 
 func _on_StateAnimation_renamed():
 	# Will guess the animation to play
-	var ap = get_node(animation_player)
+	var ap = get_node_or_null(animation_player)
 	if ap and ap.has_animation(name) and anim_on_enter == "":
 		anim_on_enter = name
