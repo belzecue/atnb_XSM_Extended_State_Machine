@@ -58,9 +58,6 @@ var animation_player: NodePath = NodePath() setget set_animation_player
 # INIT
 #
 func _ready() -> void:
-	prints("state animation", name)
-	get_node_or_null("")
-	prints("state animation 2", name)
 	if Engine.is_editor_hint():
 		var _conn = connect("renamed", self, "_on_StateAnimation_renamed")
 	
@@ -82,16 +79,14 @@ func _get_configuration_warning() -> String:
 func _get_property_list():
 	var properties = []
 
+	var ap_ok := true
 	# Will guess the AnimationPlayer each time
 	# the inspector loads for this Node
 	if not animation_player or animation_player.is_empty():
 		animation_player = guess_animation_player()
-
-	# Will guess the animation to play
-	var ap = get_node_or_null(animation_player)
-	if ap and ap.has_animation(name) and anim_on_enter == "":
-		anim_on_enter = name
-
+	if not animation_player or animation_player.is_empty():
+		ap_ok = false
+	
 	# Adds a State category in the inspector
 	properties.append({
 		name = "StateAnimation",
@@ -104,37 +99,44 @@ func _get_property_list():
 		type = TYPE_NODE_PATH
 	})
 
-	var anims_hint = "NONE"
-	if ap:
-		for anim in get_node_or_null(animation_player).get_animation_list():
-			anims_hint = "%s,%s" % [anims_hint, anim]
-	properties.append({
-		name = "anim_on_enter",
-		type = TYPE_STRING,
-		hint = PROPERTY_HINT_ENUM, 
-		"hint_string": anims_hint
-	})
+	# Will guess the animation to play
+	if ap_ok:
+		var ap = get_node_or_null(animation_player)
+		if ap and ap.has_animation(name) and anim_on_enter == "":
+			anim_on_enter = name
 
-	if anim_on_enter != "NONE" and anim_on_enter != "": #ANIM_ENTER_NONE:
+
+		var anims_hint = "NONE"
+		if ap:
+			for anim in get_node_or_null(animation_player).get_animation_list():
+				anims_hint = "%s,%s" % [anims_hint, anim]
 		properties.append({
-			name = "anim_times_to_play",
-			type = TYPE_INT,
-			hint =  PROPERTY_HINT_RANGE,
-			"hint_string": "1,10,or_greater"
-		})
-		properties.append({
-			name = "on_anim_finished",
-			type = TYPE_INT,
-			hint = PROPERTY_HINT_ENUM, 
-			"hint_string": "Callback Only:0, Loop Anim:1, Chained Anim:2, Parent's choice:3, Next from Self:4"
-		})
-	if on_anim_finished == ANIM_FINISHED_CHAIN:
-		properties.append({
-			name = "chained_anim",
+			name = "anim_on_enter",
 			type = TYPE_STRING,
-			hint = PROPERTY_HINT_ENUM,
+			hint = PROPERTY_HINT_ENUM, 
 			"hint_string": anims_hint
 		})
+
+		if anim_on_enter != "NONE" and anim_on_enter != "": #ANIM_ENTER_NONE:
+			properties.append({
+				name = "anim_times_to_play",
+				type = TYPE_INT,
+				hint =  PROPERTY_HINT_RANGE,
+				"hint_string": "1,10,or_greater"
+			})
+			properties.append({
+				name = "on_anim_finished",
+				type = TYPE_INT,
+				hint = PROPERTY_HINT_ENUM, 
+				"hint_string": "Callback Only:0, Loop Anim:1, Chained Anim:2, Parent's choice:3, Next from Self:4"
+			})
+		if on_anim_finished == ANIM_FINISHED_CHAIN:
+			properties.append({
+				name = "chained_anim",
+				type = TYPE_STRING,
+				hint = PROPERTY_HINT_ENUM,
+				"hint_string": anims_hint
+			})
 
 	update_configuration_warning()
 	return properties
@@ -173,7 +175,8 @@ func set_on_anim_finished(value):
 
 # this setter to recheck the warning on a missing AnimationPlayer
 func set_animation_player(value):
-	animation_player = value
+	if value:
+		animation_player = value
 	update_configuration_warning()
 
 
@@ -256,6 +259,8 @@ func is_playing(anim: String) -> bool:
 # PRIVATE FUNCTIONS
 #
 func guess_animation_player() -> NodePath:
+	if not state_root:
+		state_root = get_parent().state_root
 	for c in state_root.get_parent().get_children():
 		if c is AnimationPlayer:
 			return get_path_to(c)

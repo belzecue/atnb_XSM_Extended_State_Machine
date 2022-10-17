@@ -147,7 +147,6 @@ var changing_state_level := 0
 # INIT
 #
 func _ready() -> void:
-	prints("state", name)
 	# Deal with the next_state of the previous state
 	# If you want to avoid setting an empty next_state, set it to itself in the inspector
 	var node_pos = get_position_in_parent()
@@ -175,6 +174,10 @@ func _ready() -> void:
 			enter()
 			init_children_states(true)
 			_after_enter(null)
+	# In editor only
+	else:
+		# Deal with script changes issues:
+		connect("script_changed", self, "_on_script_changed")
 
 
 func _exit_tree() -> void:
@@ -851,3 +854,7 @@ func is_debugged():
 			return true
 		ancester = ancester.get_parent()
 	return false
+
+
+func _on_script_changed():
+	update_configuration_warning()
