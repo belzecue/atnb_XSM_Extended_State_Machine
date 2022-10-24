@@ -1,7 +1,7 @@
 XSM Extended State Machine
 ==========================
 
-Latest version : 2.0.2
+Latest version : 2.0.3
 (CAREFUL, This 2.0 version is a new (better) implementation of XSM, lots of changes to your old XSM woud be needed to an old XSM)
 
 A freely inspired implementation of [StateCharts](https://statecharts.github.io/what-is-a-statechart.html) for Godot. This plugin provides States composition (ie sub-States), regions (ie parallel States) and helper functions for animations and timers. It is licensed MIT and written by [ATN](https://gitlab.com/atnb).

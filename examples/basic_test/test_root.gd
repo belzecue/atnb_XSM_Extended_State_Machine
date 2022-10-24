@@ -37,4 +37,6 @@ func write_active_states():
 	var result = ""
 	for s in active_states:
 		result = "%s %s" % [result, s]
-	target.text = result
+	var main = get_parent()
+	var act = main.get_node("%ActiveStates")
+	act.text = result

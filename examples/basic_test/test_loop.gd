@@ -2,14 +2,16 @@ tool
 extends StateLoop
 
 
+onready var loop_buttons = get_node("%HBCLoopButtons")
+
 # FUNCTIONS AVAILABLE TO INHERIT
 
 func _on_enter(_args) -> void:
-	target.show()
+	loop_buttons.show()
 
 
 func _on_exit(_args) -> void:
-	target.hide()
+	loop_buttons.hide()
 
 
 func _on_LoopPrev_pressed():

@@ -21,7 +21,7 @@ func _ready():
 func ray(ray_dir, goal, length_factor):
 	var space_state = get_world_2d().direct_space_state
 	var to = global_position
-	
+
 	match goal:
 		TOP_FRONT:
 			to.x += length_factor * ray_dir * $Body.shape.extents.x
@@ -43,7 +43,7 @@ func detect_wall_dir():
 	var raysult3 = ray(skin.scale.x, TOP_FRONT, 1.5)
 	if raysult1.empty() and raysult2.empty() and raysult3.empty():
 		wall_dir = - skin.scale.x
-	else: 
+	else:
 		wall_dir = skin.scale.x
 
 

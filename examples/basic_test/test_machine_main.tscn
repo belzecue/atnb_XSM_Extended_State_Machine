@@ -12,68 +12,67 @@ anchor_bottom = 1.0
 
 [node name="StateRoot" type="Node" parent="."]
 script = ExtResource( 1 )
-history_size = 0
-fsm_owner = NodePath("")
-animation_player = NodePath("")
+history_size = 10
+fsm_owner = NodePath("../Panel/VBoxContainer/HBCActiveStates/ActiveStates")
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="State1" type="Node" parent="StateRoot"]
 script = ExtResource( 5 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Substate1" type="Node" parent="StateRoot/State1"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Substate2" type="Node" parent="StateRoot/State1"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Substate3" type="Node" parent="StateRoot/State1"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="StateRegions" type="Node" parent="StateRoot"]
 script = ExtResource( 4 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Region1" type="Node" parent="StateRoot/StateRegions"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Region2" type="Node" parent="StateRoot/StateRegions"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Region3" type="Node" parent="StateRoot/StateRegions"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="StateLoop" type="Node" parent="StateRoot"]
@@ -82,42 +81,42 @@ exit_state = NodePath("../State1/Substate3")
 exit_state = NodePath("../State1/Substate3")
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Loop1" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Loop2" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Loop3" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Loop4" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Loop5" type="Node" parent="StateRoot/StateLoop"]
 script = ExtResource( 2 )
 disabled = false
 debug_mode = false
-anim_on_enter = 0
+timed = false
 next_state = NodePath("")
 
 [node name="Panel" type="Panel" parent="."]
@@ -129,52 +128,54 @@ anchor_bottom = 1.0
 alignment = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="Panel/VBoxContainer"]
-margin_right = 512.0
+margin_right = 1024.0
 margin_bottom = 20.0
 custom_constants/margin_top = 20
 
 [node name="HBCActiveStates" type="HBoxContainer" parent="Panel/VBoxContainer"]
 margin_top = 24.0
-margin_right = 512.0
+margin_right = 1024.0
 margin_bottom = 38.0
 alignment = 1
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/HBCActiveStates"]
-margin_left = 208.0
-margin_right = 299.0
+margin_left = 464.0
+margin_right = 555.0
 margin_bottom = 14.0
 text = "Active States: "
 
 [node name="ActiveStates" type="Label" parent="Panel/VBoxContainer/HBCActiveStates"]
-margin_left = 303.0
-margin_right = 303.0
+unique_name_in_owner = true
+margin_left = 559.0
+margin_right = 559.0
 margin_bottom = 14.0
 
 [node name="HBCButtons" type="HBoxContainer" parent="Panel/VBoxContainer"]
 margin_top = 42.0
-margin_right = 512.0
+margin_right = 1024.0
 margin_bottom = 62.0
 alignment = 1
 
 [node name="Goto1" type="Button" parent="Panel/VBoxContainer/HBCButtons"]
-margin_left = 89.0
-margin_right = 176.0
+margin_left = 345.0
+margin_right = 432.0
 margin_bottom = 20.0
 text = "Goto State1"
 
 [node name="GotoRegions" type="Button" parent="Panel/VBoxContainer/HBCButtons"]
-margin_left = 180.0
-margin_right = 309.0
+margin_left = 436.0
+margin_right = 565.0
 margin_bottom = 20.0
 text = "Goto StateRegions"
 
 [node name="GotoLoop" type="Button" parent="Panel/VBoxContainer/HBCButtons"]
-margin_left = 313.0
-margin_right = 423.0
+margin_left = 569.0
+margin_right = 679.0
 margin_bottom = 20.0
 text = "Goto StateLoop"
 
 [node name="HBCLoopButtons" type="HBoxContainer" parent="Panel/VBoxContainer"]
+unique_name_in_owner = true
 visible = false
 margin_top = 66.0
 margin_right = 543.0
@@ -190,9 +191,9 @@ custom_constants/margin_right = 120
 margin_left = 224.0
 margin_right = 309.0
 margin_bottom = 20.0
-text = "Disabled"
+text = "Forward"
 items = [ "Disabled", null, false, 0, null, "Forward", null, false, 1, null, "Backward", null, false, 2, null, "Ping-Pong", null, false, 3, null ]
-selected = 0
+selected = 1
 
 [node name="LoopPrev" type="Button" parent="Panel/VBoxContainer/HBCLoopButtons"]
 margin_left = 313.0
@@ -220,6 +221,7 @@ margin_bottom = 66.0
 alignment = 1
 
 [node name="History" type="VBoxContainer" parent="Panel/VBoxContainer/HBCHistory"]
+unique_name_in_owner = true
 margin_left = 144.0
 margin_right = 144.0
 
