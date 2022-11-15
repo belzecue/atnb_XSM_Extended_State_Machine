@@ -18,8 +18,6 @@ func _on_enter(_args) -> void:
 		var _s2 = change_state("Fall")
 
 	
-
-
 func _on_update(delta):
 	# Very ugly sound management, please implement a better way
 	# in production !!!
