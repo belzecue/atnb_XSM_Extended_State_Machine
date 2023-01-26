@@ -36,7 +36,7 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "State": "res://addons/xsm/icons/state.png",
-"StateAnimation": "res://addons/xsm/icons/state.png",
+"StateAnimation": "res://addons/xsm/icons/state_animation.png",
 "StateLoop": "res://addons/xsm/icons/state_loop.png",
 "StateRand": "res://addons/xsm/icons/state_rand.png",
 "StateRegions": "res://addons/xsm/icons/state_regions.png"
@@ -61,7 +61,7 @@ script_templates_search_path="res://addons/xsm/templates/"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "xsm" )
+enabled=PoolStringArray( "res://addons/xsm/plugin.cfg" )
 
 [gdnative]
 

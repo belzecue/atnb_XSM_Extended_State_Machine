@@ -15,7 +15,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 tool
-class_name StateAnimation, "res://addons/xsm/icons/state.png"
+class_name StateAnimation, "res://addons/xsm/icons/state_animation.png"
 extends State
 
 # StateAnimation is there for all your States that play an animation on enter
