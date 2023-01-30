@@ -1624,7 +1624,7 @@ speed = Vector2( 100, 0 )
 position = Vector2( -1.5, -1 )
 frames = SubResource( 126 )
 animation = "Walk"
-frame = 6
+frame = 5
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AnEgg"]
